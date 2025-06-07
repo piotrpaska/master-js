@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Track {
+  id String @id @default(cuid())
+  startTime BigInt @default(0)
+  prevDuration BigInt @default(0)
+  running Boolean @default(false)
+  assignedEntryId String?
+  entry Entry? @relation(fields: [assignedEntryId], references: [id])
+}
+
+model Record {
+  id String @id @default(cuid())
+  startTime BigInt @default(0)
+  endTime BigInt @default(0)
+  duration BigInt @default(0)
+  track String @default("")
+  entryId String
+
+  timestamp DateTime @default(now())
+}
+
+model Device {
+  id String @id @default(cuid())
+  deviceId String @unique
+  name String @default("")
+  type String @default("")
+  lastSeen DateTime @default(now())
+}
+
+model LiveAgents {
+  id String @id @default(cuid())
+  deviceId String @unique
+  deviceName String @default("")
+  live Boolean @default(false)
+}
+
+model StartList {
+  id String @id @default(cuid())
+  title String @default("")
+
+  Entries Entry[]
+}
+
+model Entry {
+  id String @id @default(cuid())
+  athleteId String?
+  athlete Athlete? @relation(fields: [athleteId], references: [id])
+  startListId String?
+  startList StartList? @relation(fields: [startListId], references: [id])
+  bib String
+  alreadyStarted Boolean @default(false)
+
+  Tracks Track[]
+}
+
+model Athlete {
+  id String @id @default(cuid())
+  name String @default("")
+
+  Entries Entry[]
+}

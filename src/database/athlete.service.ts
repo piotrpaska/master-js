@@ -1,0 +1,55 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+import { Prisma, Athlete } from 'generated/prisma';
+
+@Injectable()
+export class AthleteService {
+  constructor(private prisma: PrismaService) {}
+
+  async user(
+    athleteWhereUniqueInput: Prisma.AthleteWhereUniqueInput,
+  ): Promise<Athlete | null> {
+    return this.prisma.athlete.findUnique({
+      where: athleteWhereUniqueInput,
+    });
+  }
+
+  async athletes(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.AthleteWhereUniqueInput;
+    where?: Prisma.AthleteWhereInput;
+    orderBy?: Prisma.AthleteOrderByWithRelationInput;
+  }): Promise<Athlete[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.athlete.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async createAthlete(data: Prisma.AthleteCreateInput): Promise<Athlete> {
+    return this.prisma.athlete.create({
+      data,
+    });
+  }
+
+  async updateAthlete(
+    where: Prisma.AthleteWhereUniqueInput,
+    data: Prisma.AthleteUpdateInput,
+  ): Promise<Athlete> {
+    return this.prisma.athlete.update({
+      where,
+      data,
+    });
+  }
+
+  async deleteAthlete(where: Prisma.AthleteWhereUniqueInput): Promise<Athlete> {
+    return this.prisma.athlete.delete({
+      where,
+    });
+  }
+}
