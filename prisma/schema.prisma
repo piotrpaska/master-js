@@ -14,14 +14,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Track {
+/*model Track {
   id String @id @default(cuid())
   startTime BigInt @default(0)
   prevDuration BigInt @default(0)
   running Boolean @default(false)
   assignedEntryId String?
   entry Entry? @relation(fields: [assignedEntryId], references: [id])
-}
+}*/
 
 model Record {
   id String @id @default(cuid())
@@ -30,11 +30,15 @@ model Record {
   duration BigInt @default(0)
   track String
   entryId String
-
+  startListId String
   timestamp DateTime @default(now())
+  
+  startList StartList? @relation(fields: [startListId], references: [id])
+
+  entry Entry? @relation(fields: [entryId], references: [id])
 }
 
-model Device {
+/*model Device {
   id String @id @default(cuid())
   deviceId String @unique
   name String
@@ -47,13 +51,15 @@ model LiveAgents {
   deviceId String @unique
   deviceName String
   live Boolean @default(false)
-}
+}*/
 
 model StartList {
   id String @id @default(cuid())
   title String
 
   Entries Entry[]
+
+  Records Record[]
 }
 
 model Entry {
@@ -65,7 +71,9 @@ model Entry {
   bib String
   alreadyStarted Boolean @default(false)
 
-  Tracks Track[]
+  //Tracks Track[]
+
+  Records Record[]
 }
 
 model Athlete {
