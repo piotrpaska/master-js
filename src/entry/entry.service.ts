@@ -8,9 +8,11 @@ export class EntryService {
 
   async entry(
     entryWhereUniqueInput: Prisma.EntryWhereUniqueInput,
+    include?: Prisma.EntryInclude,
   ): Promise<Entry | null> {
     return this.prisma.entry.findUnique({
       where: entryWhereUniqueInput,
+      include,
     });
   }
 
@@ -20,14 +22,16 @@ export class EntryService {
     cursor?: Prisma.EntryWhereUniqueInput;
     where?: Prisma.EntryWhereInput;
     orderBy?: Prisma.EntryOrderByWithRelationInput;
+    include?: Prisma.EntryInclude;
   }): Promise<Entry[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { skip, take, cursor, where, orderBy, include } = params;
     return this.prisma.entry.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
+      include,
     });
   }
 
