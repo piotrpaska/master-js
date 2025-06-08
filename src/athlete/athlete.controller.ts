@@ -19,12 +19,23 @@ export class AthleteController {
 
   @Get()
   async getAthletes(): Promise<AthleteModel[]> {
-    return this.athleteService.athletes({});
+    return this.athleteService.athletes({
+      include: {
+        entries: {
+          include: {
+            startList: true,
+          },
+        },
+      },
+    });
   }
 
   @Get(':id')
   async getAthlete(@Param('id') id: string): Promise<AthleteModel | null> {
-    const athlete = await this.athleteService.user({ id });
+    const athlete = await this.athleteService.user(
+      { id },
+      { entries: { include: { startList: true } } },
+    );
     if (!athlete) {
       throw new NotFoundException(`Athlete with id ${id} not found`);
     }

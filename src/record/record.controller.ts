@@ -17,12 +17,31 @@ export class RecordController {
 
   @Get()
   async getRecords() {
-    return this.recordService.records({});
+    return this.recordService.records({
+      include: {
+        entry: {
+          include: {
+            athlete: true,
+          },
+        },
+        startList: true,
+      },
+    });
   }
 
   @Get(':id')
   async getRecord(@Param('id') id: string) {
-    const record = await this.recordService.record({ id });
+    const record = await this.recordService.record(
+      { id },
+      {
+        entry: {
+          include: {
+            athlete: true,
+          },
+        },
+        startList: true,
+      },
+    );
     if (!record) {
       throw new NotFoundException(`Record with id ${id} not found`);
     }

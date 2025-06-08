@@ -8,9 +8,11 @@ export class StartListService {
 
   async startList(
     startListWhereUniqueInput: Prisma.StartListWhereUniqueInput,
+    include?: Prisma.StartListInclude,
   ): Promise<StartList | null> {
     return this.prisma.startList.findUnique({
       where: startListWhereUniqueInput,
+      include,
     });
   }
 
@@ -20,18 +22,16 @@ export class StartListService {
     cursor?: Prisma.StartListWhereUniqueInput;
     where?: Prisma.StartListWhereInput;
     orderBy?: Prisma.StartListOrderByWithRelationInput;
+    include?: Prisma.StartListInclude;
   }): Promise<StartList[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { skip, take, cursor, where, orderBy, include } = params;
     return await this.prisma.startList.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
-      include: {
-        entries: true,
-        records: true,
-      },
+      include,
     });
   }
 

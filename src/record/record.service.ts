@@ -8,9 +8,11 @@ export class RecordService {
 
   async record(
     recordWhereUniqueInput: Prisma.RecordWhereUniqueInput,
+    include?: Prisma.RecordInclude,
   ): Promise<Record | null> {
     return this.prisma.record.findUnique({
       where: recordWhereUniqueInput,
+      include,
     });
   }
 
@@ -20,14 +22,16 @@ export class RecordService {
     cursor?: Prisma.RecordWhereUniqueInput;
     where?: Prisma.RecordWhereInput;
     orderBy?: Prisma.RecordOrderByWithRelationInput;
+    include?: Prisma.RecordInclude;
   }): Promise<Record[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { skip, take, cursor, where, orderBy, include } = params;
     return this.prisma.record.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
+      include,
     });
   }
 

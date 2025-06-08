@@ -8,9 +8,11 @@ export class AthleteService {
 
   async user(
     athleteWhereUniqueInput: Prisma.AthleteWhereUniqueInput,
+    include?: Prisma.AthleteInclude,
   ): Promise<Athlete | null> {
     return this.prisma.athlete.findUnique({
       where: athleteWhereUniqueInput,
+      include,
     });
   }
 
@@ -20,14 +22,16 @@ export class AthleteService {
     cursor?: Prisma.AthleteWhereUniqueInput;
     where?: Prisma.AthleteWhereInput;
     orderBy?: Prisma.AthleteOrderByWithRelationInput;
+    include?: Prisma.AthleteInclude;
   }): Promise<Athlete[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { skip, take, cursor, where, orderBy, include } = params;
     return this.prisma.athlete.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
+      include,
     });
   }
 
