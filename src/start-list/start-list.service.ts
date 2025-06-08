@@ -22,12 +22,16 @@ export class StartListService {
     orderBy?: Prisma.StartListOrderByWithRelationInput;
   }): Promise<StartList[]> {
     const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.startList.findMany({
+    return await this.prisma.startList.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
+      include: {
+        entries: true,
+        records: true,
+      },
     });
   }
 

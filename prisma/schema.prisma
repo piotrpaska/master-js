@@ -65,9 +65,9 @@ model StartList {
   id String @id @default(cuid())
   title String
 
-  Entries Entry[]
+  entries Entry[]
 
-  Records Record[]
+  records Record[]
 }
 
 model Entry {
@@ -81,12 +81,12 @@ model Entry {
 
   //Tracks Track[]
 
-  Records Record[]
+  records Record[]
 }
 
 model Athlete {
   id String @id @default(cuid())
   name String
 
-  Entries Entry[]
+  entries Entry[]
 }
