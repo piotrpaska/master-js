@@ -28,7 +28,7 @@ model Record {
   startTime BigInt @default(0)
   endTime BigInt @default(0)
   duration BigInt @default(0)
-  track String @default("")
+  track String
   entryId String
 
   timestamp DateTime @default(now())
@@ -37,21 +37,21 @@ model Record {
 model Device {
   id String @id @default(cuid())
   deviceId String @unique
-  name String @default("")
-  type String @default("")
+  name String
+  type String
   lastSeen DateTime @default(now())
 }
 
 model LiveAgents {
   id String @id @default(cuid())
   deviceId String @unique
-  deviceName String @default("")
+  deviceName String
   live Boolean @default(false)
 }
 
 model StartList {
   id String @id @default(cuid())
-  title String @default("")
+  title String
 
   Entries Entry[]
 }
@@ -70,7 +70,7 @@ model Entry {
 
 model Athlete {
   id String @id @default(cuid())
-  name String @default("")
+  name String
 
   Entries Entry[]
 }
