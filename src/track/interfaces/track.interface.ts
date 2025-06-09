@@ -1,7 +1,9 @@
 export interface Track {
   id: string;
-  startTime: bigint;
-  prevDuration: bigint;
+  name: string;
+  startTime: bigint | null;
+  prevDuration: bigint | null;
   running: boolean;
   entryId: string | null;
+  relatedLastRecordId: string | null;
 }
