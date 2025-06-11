@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TrackGateway } from './track-sensor.gateway';
+import { SensorGateway } from './sensor.gateway';
 
-describe('TrackGateway', () => {
-  let gateway: TrackGateway;
+describe('SensorGateway', () => {
+  let gateway: SensorGateway;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [TrackGateway],
+      providers: [SensorGateway],
     }).compile();
 
-    gateway = module.get<TrackGateway>(TrackGateway);
+    gateway = module.get<SensorGateway>(SensorGateway);
   });
 
   it('should be defined', () => {

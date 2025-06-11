@@ -18,3 +18,12 @@ tracks:
       - id: '2'
         name: 'Sensor 2'
         type: 'finish'
+  - id: '2'
+    name: 'Track 2'
+    sensors:
+      - id: '3'
+        name: 'Sensor 3'
+        type: 'start'
+      - id: '4'
+        name: 'Sensor 4'
+        type: 'finish'

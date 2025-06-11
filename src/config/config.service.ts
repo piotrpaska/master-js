@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Config } from './interfaces/config.interface';
+import { Config, TrackConfig } from './interfaces/config.interface';
 import * as fs from 'fs';
 import { load } from 'js-yaml';
 import { z } from 'zod';
@@ -35,6 +35,10 @@ const configSchema = z
 @Injectable()
 export class ConfigService {
   private config: Config;
+  private sensorsWithTrack: Map<
+    string,
+    { trackId: string; sensorType: 'start' | 'finish' }
+  >;
 
   constructor() {
     this.loadConfig(); // Ensure config is loaded as soon as the service is instantiated
@@ -55,6 +59,29 @@ export class ConfigService {
         process.exit(1); // Exit if config is invalid
       }
       this.config = parsedConfig.data as unknown as Config; // Assign validated config with double cast
+
+      const tracks: TrackConfig[] = this.config.tracks;
+
+      this.sensorsWithTrack = tracks
+        .map((track) => {
+          return track.sensors.map((sensor) => ({
+            id: sensor.id,
+            trackId: track.id,
+            sensorType: sensor.type,
+          }));
+        })
+        .reduce((acc, curr) => {
+          curr.forEach((sensor) => {
+            acc.set(sensor.id, {
+              trackId: sensor.trackId,
+              sensorType: sensor.sensorType,
+            });
+          });
+          return acc;
+        }, new Map<string, { trackId: string; sensorType: 'start' | 'finish' }>());
+
+      console.log('Config loaded successfully:', this.config);
+      console.log('Sensors with track mapping:', this.sensorsWithTrack);
     } catch (e) {
       console.error('Error loading config file:', e);
       process.exit(1); // Exit if config cannot be loaded
@@ -63,5 +90,15 @@ export class ConfigService {
 
   getConfig(): Config {
     return this.config;
+  }
+
+  getTrackIdBySensorId(sensorId: string): string | null {
+    const sensorInfo = this.sensorsWithTrack.get(sensorId);
+    return sensorInfo ? sensorInfo.trackId : null;
+  }
+
+  getSensorTypeById(sensorId: string): 'start' | 'finish' | null {
+    const sensorInfo = this.sensorsWithTrack.get(sensorId);
+    return sensorInfo ? sensorInfo.sensorType : null;
   }
 }

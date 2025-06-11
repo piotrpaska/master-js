@@ -3,29 +3,38 @@ import { Track } from './interfaces/track.interface';
 import { Entry as EntryModel, RecordStatus } from 'generated/prisma';
 import { EntryService } from 'src/entry/entry.service';
 import { CreateTrackDto } from './dto/create-track.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { RecordService } from 'src/record/record.service';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class TrackService implements OnModuleInit {
   constructor(
     private entryService: EntryService,
     private recordService: RecordService,
+    private configService: ConfigService,
   ) {}
 
   onModuleInit() {
-    // This will be called when the module is initialized
-    // Setup tracks
+    const config = this.configService.getConfig();
+    if (!config.tracks || config.tracks.length === 0) {
+      throw new Error('No tracks defined in the configuration');
+    }
+    this.tracks = config.tracks.map((trackConfig) =>
+      this.createTrack({
+        id: trackConfig.id,
+        name: trackConfig.name,
+      }),
+    );
   }
 
   private tracks: Track[] = [];
 
   createTrack(data: CreateTrackDto): Track {
     const newTrack: Track = {
-      id: uuidv4(),
+      id: data.id,
       name: data.name,
-      startTime: BigInt(0),
-      prevDuration: BigInt(0),
+      startTime: null,
+      prevDuration: null,
       running: false,
       entryId: null,
       relatedLastRecordId: null,
@@ -125,7 +134,7 @@ export class TrackService implements OnModuleInit {
     return null;
   }
 
-  startTrack(id: string, startTime: bigint): Track | null {
+  startTrack(id: string, startTime: number): Track | null {
     const track = this.getTrackById(id);
     if (track) {
       if (track.running) {
@@ -138,7 +147,7 @@ export class TrackService implements OnModuleInit {
 
       track.startTime = startTime;
       track.running = true;
-      track.prevDuration = BigInt(0);
+      track.prevDuration = null;
       return track;
     }
     throw new NotFoundException(`Track with ID ${id} not found`);
@@ -146,7 +155,7 @@ export class TrackService implements OnModuleInit {
 
   async stopTrackAndSaveTime(
     id: string,
-    endTime: bigint,
+    endTime: number,
   ): Promise<Track | null> {
     const track = this.getTrackById(id);
     if (track) {
@@ -158,7 +167,7 @@ export class TrackService implements OnModuleInit {
         throw new Error(`Track with ID ${id} has no entry assigned`);
       }
 
-      if (track.startTime === null || track.startTime === BigInt(0)) {
+      if (track.startTime === null || track.startTime === 0) {
         throw new Error(`Track with ID ${id} has not been started`);
       }
 
@@ -213,7 +222,7 @@ export class TrackService implements OnModuleInit {
         throw new Error(`Track with ID ${id} has no entry assigned`);
       }
 
-      if (track.startTime === null || track.startTime === BigInt(0)) {
+      if (track.startTime === null || track.startTime === 0) {
         throw new Error(`Track with ID ${id} has not been started`);
       }
 

@@ -8,6 +8,7 @@ import { EntryModule } from './entry/entry.module';
 import { StartListModule } from './start-list/start-list.module';
 import { TrackModule } from './track/track.module';
 import { ConfigModule } from './config/config.module';
+import { SensorModule } from './sensor/sensor.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConfigModule } from './config/config.module';
     StartListModule,
     TrackModule,
     ConfigModule,
+    SensorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
