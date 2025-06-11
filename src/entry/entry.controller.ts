@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { EntryService } from './entry.service';
 import { CreateEntryDto } from './dto/create-entry.dto';
+import { Prisma } from 'generated/prisma';
 
 @Controller('entry')
 export class EntryController {
@@ -30,7 +31,13 @@ export class EntryController {
 
   @Post()
   async createEntry(@Body() data: CreateEntryDto) {
-    return this.entryService.createEntry(data);
+    const entryCreateInput: Prisma.EntryCreateInput = {
+      athlete: { connect: { id: data.athleteId } },
+      startList: { connect: { id: data.startListId } },
+      bib: data.bib,
+    };
+
+    return this.entryService.createEntry(entryCreateInput);
   }
 
   @Put(':id')

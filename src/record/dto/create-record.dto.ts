@@ -2,7 +2,7 @@ export class CreateRecordDto {
   startTime: number;
   endTime: number | null;
   duration: number | null;
-  startListId: number;
+  startListId: string;
   track: string;
   entryId: string;
   timestamp: Date;

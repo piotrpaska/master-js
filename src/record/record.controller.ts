@@ -51,7 +51,17 @@ export class RecordController {
   @Post()
   async createRecord(@Body() data: CreateRecordDto) {
     try {
-      return this.recordService.createRecord(data);
+      // Map CreateRecordDto to RecordCreateInput
+      const recordCreateInput = {
+        track: data.track,
+        duration: data.duration,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        status: data.status,
+        entry: { connect: { id: data.entryId } },
+        startList: { connect: { id: data.startListId } },
+      };
+      return this.recordService.createRecord(recordCreateInput);
     } catch {
       throw new BadRequestException(`Failed to create record`);
     }
