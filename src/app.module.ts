@@ -7,6 +7,7 @@ import { RecordModule } from './record/record.module';
 import { EntryModule } from './entry/entry.module';
 import { StartListModule } from './start-list/start-list.module';
 import { TrackModule } from './track/track.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TrackModule } from './track/track.module';
     EntryModule,
     StartListModule,
     TrackModule,
+    ConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],
