@@ -9,6 +9,7 @@ import { StartListModule } from './start-list/start-list.module';
 import { TrackModule } from './track/track.module';
 import { ConfigModule } from './config/config.module';
 import { SensorModule } from './sensor/sensor.module';
+import { DeviceModule } from './device/device.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SensorModule } from './sensor/sensor.module';
     TrackModule,
     ConfigModule,
     SensorModule,
+    DeviceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

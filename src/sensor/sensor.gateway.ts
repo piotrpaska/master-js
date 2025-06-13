@@ -1,7 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from 'src/config/config.service';
 import { TrackService } from 'src/track/track.service';
-import { Server, WebSocket } from 'ws';
+import { Server } from 'ws';
+import { DeviceService } from 'src/device/device.service';
 import { z } from 'zod';
 
 const sensorDataSchema = z.object({
@@ -14,6 +15,7 @@ export class SensorGateway implements OnModuleInit {
   constructor(
     private readonly trackService: TrackService,
     private readonly configService: ConfigService,
+    private readonly deviceService: DeviceService,
   ) {}
 
   private wss: Server;
@@ -29,8 +31,18 @@ export class SensorGateway implements OnModuleInit {
       );
     });
 
-    this.wss.on('connection', (ws: WebSocket) => {
+    this.wss.on('connection', (ws, req) => {
       console.log('New sensor connected');
+
+      const clientId = req.url?.split('/').pop() || null;
+
+      if (!clientId) {
+        console.error('Client ID not provided in the request URL');
+        ws.close();
+        return;
+      }
+
+      this.deviceService.setLiveConnection(clientId, true);
 
       ws.on('message', (message: string) => {
         console.log(`Received message from sensor: ${message}`);
@@ -61,6 +73,7 @@ export class SensorGateway implements OnModuleInit {
 
       ws.on('close', () => {
         console.log('Sensor disconnected');
+        this.deviceService.setLiveConnection(clientId, false);
       });
     });
   }

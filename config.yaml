@@ -4,7 +4,7 @@ ports:
 
 speaker:
   enabled: true
-  id: '3'
+  id: '5'
   name: 'Speaker start'
 
 tracks:
@@ -20,6 +20,7 @@ tracks:
         type: 'finish'
   - id: '2'
     name: 'Track 2'
+    color: '#00FF00'
     sensors:
       - id: '3'
         name: 'Sensor 3'

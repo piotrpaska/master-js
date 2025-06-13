@@ -88,6 +88,10 @@ export class ConfigService {
     }
   }
 
+  refreshConfig() {
+    this.loadConfig(); // Reload the configuration
+  }
+
   getConfig(): Config {
     return this.config;
   }
@@ -100,5 +104,29 @@ export class ConfigService {
   getSensorTypeById(sensorId: string): 'start' | 'finish' | null {
     const sensorInfo = this.sensorsWithTrack.get(sensorId);
     return sensorInfo ? sensorInfo.sensorType : null;
+  }
+
+  getInitialDevices(): {
+    id: string;
+    name: string;
+    type: 'sensor' | 'speaker';
+  }[] {
+    const sensors = this.config.tracks.flatMap((track) =>
+      track.sensors.map((sensor) => ({
+        id: sensor.id,
+        name: sensor.name,
+        type: 'sensor' as const,
+      })),
+    );
+    const speaker = this.config.speaker.enabled
+      ? [
+          {
+            id: this.config.speaker.id,
+            name: this.config.speaker.name,
+            type: 'speaker' as const,
+          },
+        ]
+      : [];
+    return [...sensors, ...speaker];
   }
 }
