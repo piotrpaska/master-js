@@ -1,0 +1,30 @@
+ports:
+  http: 3000
+  sensors: 4000
+
+speaker:
+  enabled: true
+  id: '5'
+  name: 'Speaker start'
+
+tracks:
+  - id: '1'
+    name: 'Track 1'
+    color: '#FF0000'
+    sensors:
+      - id: '1'
+        name: 'Sensor 1'
+        type: 'start'
+      - id: '2'
+        name: 'Sensor 2'
+        type: 'finish'
+  - id: '2'
+    name: 'Track 2'
+    color: '#00FF00'
+    sensors:
+      - id: '3'
+        name: 'Sensor 3'
+        type: 'start'
+      - id: '4'
+        name: 'Sensor 4'
+        type: 'finish'
