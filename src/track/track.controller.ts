@@ -7,10 +7,14 @@ import {
   Put,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
+import { SpeakerGateway } from 'src/speaker/speaker.gateway';
 
 @Controller('track')
 export class TrackController {
-  constructor(private trackService: TrackService) {}
+  constructor(
+    private trackService: TrackService,
+    private readonly speakerGateway: SpeakerGateway,
+  ) {}
 
   @Get()
   async getTracks() {
@@ -37,6 +41,15 @@ export class TrackController {
       throw new NotFoundException(`Track with ID ${id} not found`);
     }
     return this.trackService.assignEntryIdToTrack(id, entryId);
+  }
+
+  @Put('/start-all')
+  startAllTracks() {
+    try {
+      this.speakerGateway.updateStartTime(Date.now() + 10000);
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
   }
 
   @Put(':id/pause')

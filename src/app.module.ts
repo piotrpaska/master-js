@@ -10,6 +10,7 @@ import { TrackModule } from './track/track.module';
 import { ConfigModule } from './config/config.module';
 import { SensorModule } from './sensor/sensor.module';
 import { DeviceModule } from './device/device.module';
+import { SpeakerModule } from './speaker/speaker.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { DeviceModule } from './device/device.module';
     ConfigModule,
     SensorModule,
     DeviceModule,
+    SpeakerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,6 +9,7 @@ const configSchema = z
     ports: z.object({
       http: z.number().int().positive(),
       sensors: z.number().int().positive(),
+      speaker: z.number().int().positive(),
     }),
     speaker: z.object({
       enabled: z.boolean(),

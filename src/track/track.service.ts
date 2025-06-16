@@ -134,6 +134,12 @@ export class TrackService implements OnModuleInit {
     return null;
   }
 
+  startAllTracks(startTime: number): Track[] {
+    return this.tracks
+      .map((track) => this.startTrack(track.id, startTime))
+      .filter(Boolean) as Track[];
+  }
+
   startTrack(id: string, startTime: number): Track | null {
     const track = this.getTrackById(id);
     if (track) {

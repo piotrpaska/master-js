@@ -2,6 +2,7 @@ export interface Config {
   ports: {
     http: number;
     sensors: number;
+    speaker: number;
   };
   speaker: SpeakerConfig;
   tracks: TrackConfig[];
