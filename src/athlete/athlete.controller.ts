@@ -32,7 +32,7 @@ export class AthleteController {
 
   @Get(':id')
   async getAthlete(@Param('id') id: string): Promise<AthleteModel | null> {
-    const athlete = await this.athleteService.user(
+    const athlete = await this.athleteService.athlete(
       { id },
       { entries: { include: { startList: true } } },
     );

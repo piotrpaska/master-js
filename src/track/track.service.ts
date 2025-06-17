@@ -61,15 +61,7 @@ export class TrackService implements OnModuleInit {
 
         return {
           ...track,
-          entry: track.entryId
-            ? {
-                id: track.entryId,
-                athleteId: entry?.athleteId || '',
-                startListId: entry?.startListId || '',
-                bib: entry?.bib || '',
-                alreadyStarted: entry?.alreadyStarted || false,
-              }
-            : null,
+          entry: entry,
         };
       }),
     );
@@ -92,15 +84,7 @@ export class TrackService implements OnModuleInit {
     );
     return {
       ...track,
-      entry: entry
-        ? {
-            id: entry.id,
-            athleteId: entry.athleteId,
-            startListId: entry.startListId,
-            bib: entry.bib,
-            alreadyStarted: entry.alreadyStarted,
-          }
-        : null,
+      entry: entry,
     };
   }
 

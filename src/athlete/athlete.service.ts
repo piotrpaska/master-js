@@ -6,7 +6,7 @@ import { Prisma, Athlete } from 'generated/prisma';
 export class AthleteService {
   constructor(private prisma: PrismaService) {}
 
-  async user(
+  async athlete(
     athleteWhereUniqueInput: Prisma.AthleteWhereUniqueInput,
     include?: Prisma.AthleteInclude,
   ): Promise<Athlete | null> {

@@ -3,6 +3,7 @@ export interface Config {
     http: number;
     sensors: number;
     speaker: number;
+    tracks: number;
   };
   speaker: SpeakerConfig;
   tracks: TrackConfig[];
