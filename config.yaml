@@ -3,6 +3,7 @@ ports:
   sensors: 4000
   speaker: 5000
   tracks: 6000
+  devices: 6001
 
 speaker:
   enabled: true

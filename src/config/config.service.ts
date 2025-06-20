@@ -11,6 +11,7 @@ const configSchema = z
       sensors: z.number().int().positive(),
       speaker: z.number().int().positive(),
       tracks: z.number().int().positive(),
+      devices: z.number().int().positive(),
     }),
     speaker: z.object({
       enabled: z.boolean(),

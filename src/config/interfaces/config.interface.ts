@@ -4,6 +4,7 @@ export interface Config {
     sensors: number;
     speaker: number;
     tracks: number;
+    devices: number;
   };
   speaker: SpeakerConfig;
   tracks: TrackConfig[];
