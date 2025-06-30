@@ -6,7 +6,6 @@ import { EntryModule } from 'src/entry/entry.module';
 import { RecordModule } from 'src/record/record.module';
 import { ConfigModule } from 'src/config/config.module';
 import { SpeakerModule } from 'src/speaker/speaker.module';
-import { TrackGateway } from './track.gateway';
 
 @Module({
   imports: [
@@ -17,7 +16,7 @@ import { TrackGateway } from './track.gateway';
     SpeakerModule,
   ],
   controllers: [TrackController],
-  providers: [TrackService, TrackGateway],
+  providers: [TrackService],
   exports: [TrackService],
 })
 export class TrackModule {}

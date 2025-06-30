@@ -11,6 +11,7 @@ import { ConfigModule } from './config/config.module';
 import { SensorModule } from './sensor/sensor.module';
 import { DeviceModule } from './device/device.module';
 import { SpeakerModule } from './speaker/speaker.module';
+import { AppComModule } from './app_com/app_com.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SpeakerModule } from './speaker/speaker.module';
     SensorModule,
     DeviceModule,
     SpeakerModule,
+    AppComModule,
   ],
   controllers: [AppController],
   providers: [AppService],
