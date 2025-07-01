@@ -17,13 +17,14 @@ import { TrackService } from 'src/track/track.service';
 })
 export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
+    @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
     @Inject(forwardRef(() => DeviceService))
     private readonly deviceService: DeviceService,
   ) {}
 
-  handleConnection() {
-    this.updateClientsData();
+  async handleConnection() {
+    await this.updateClientsData();
     console.log('[AppComGateway] Client connected');
   }
 
@@ -34,19 +35,21 @@ export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   @SubscribeMessage('all')
-  handleMessage(): string {
+  async handleMessage(): Promise<string> {
     return JSON.stringify({
-      tracks: this.trackService.getTracks(),
+      tracks: await this.trackService.getTracksWithEntryData(),
       devices: this.deviceService.getAllDevices(),
     });
   }
 
   @SubscribeMessage('specified')
-  handleSpecifiedMessage(@MessageBody() specified: string): string {
+  async handleSpecifiedMessage(
+    @MessageBody() specified: string,
+  ): Promise<string> {
     switch (specified) {
       case 'tracks':
         return JSON.stringify({
-          tracks: this.trackService.getTracks(),
+          tracks: await this.trackService.getTracksWithEntryData(),
         });
       case 'devices':
         return JSON.stringify({
@@ -59,9 +62,9 @@ export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  updateClientsData() {
+  async updateClientsData() {
     this.server.emit('data', {
-      tracks: this.trackService.getTracks(),
+      tracks: await this.trackService.getTracksWithEntryData(),
       devices: this.deviceService.getAllDevices(),
     });
   }

@@ -1,10 +1,17 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Track } from './interfaces/track.interface';
 import { Entry as EntryModel, RecordStatus } from 'generated/prisma';
 import { EntryService } from 'src/entry/entry.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { RecordService } from 'src/record/record.service';
 import { ConfigService } from 'src/config/config.service';
+import { AppComGateway } from 'src/app_com/app_com.gateway';
 
 @Injectable()
 export class TrackService implements OnModuleInit {
@@ -12,6 +19,8 @@ export class TrackService implements OnModuleInit {
     private entryService: EntryService,
     private recordService: RecordService,
     private configService: ConfigService,
+    @Inject(forwardRef(() => AppComGateway))
+    private appComModule: AppComGateway,
   ) {}
 
   onModuleInit() {
@@ -88,43 +97,56 @@ export class TrackService implements OnModuleInit {
     };
   }
 
-  updateTrack(id: string, updatedTrack: Partial<Track>): Track | undefined {
+  async updateTrack(
+    id: string,
+    updatedTrack: Partial<Track>,
+  ): Promise<Track | undefined> {
     const track = this.getTrackById(id);
     if (track) {
       Object.assign(track, updatedTrack);
     }
+    await this.appComModule.updateClientsData();
     return track;
   }
 
-  deleteTrack(id: string): boolean {
+  async deleteTrack(id: string): Promise<boolean> {
     const index = this.tracks.findIndex((track) => track.id === id);
     if (index !== -1) {
       this.tracks.splice(index, 1);
+      await this.appComModule.updateClientsData();
       return true;
     }
     return false;
   }
 
-  clearTracks(): void {
+  async clearTracks(): Promise<void> {
     this.tracks = [];
+    await this.appComModule.updateClientsData();
   }
 
-  assignEntryIdToTrack(id: string, entryId: string | null): Track | null {
+  async assignEntryIdToTrack(
+    id: string,
+    entryId: string | null,
+  ): Promise<Track | null> {
     const track = this.getTrackById(id);
     if (track) {
       track.entryId = entryId;
+      await this.appComModule.updateClientsData();
       return track;
     }
+    await this.appComModule.updateClientsData();
     return null;
   }
 
-  startAllTracks(startTime: number): Track[] {
-    return this.tracks
-      .map((track) => this.startTrack(track.id, startTime))
-      .filter(Boolean) as Track[];
+  async startAllTracks(startTime: number): Promise<Track[]> {
+    const startedTracks = await Promise.all(
+      this.tracks.map((track) => this.startTrack(track.id, startTime)),
+    );
+    await this.appComModule.updateClientsData();
+    return startedTracks.filter(Boolean) as Track[];
   }
 
-  startTrack(id: string, startTime: number): Track | null {
+  async startTrack(id: string, startTime: number): Promise<Track | null> {
     const track = this.getTrackById(id);
     if (track) {
       if (track.running) {
@@ -138,6 +160,7 @@ export class TrackService implements OnModuleInit {
       track.startTime = startTime;
       track.running = true;
       track.prevDuration = null;
+      await this.appComModule.updateClientsData();
       return track;
     }
     throw new NotFoundException(`Track with ID ${id} not found`);
@@ -192,7 +215,7 @@ export class TrackService implements OnModuleInit {
       });
 
       track.relatedLastRecordId = record.id;
-
+      await this.appComModule.updateClientsData();
       return track;
     }
     throw new NotFoundException(`Track with ID ${id} not found`);
@@ -246,13 +269,13 @@ export class TrackService implements OnModuleInit {
       });
 
       track.relatedLastRecordId = record.id;
-
+      await this.appComModule.updateClientsData();
       return track;
     }
     throw new NotFoundException(`Track with ID ${id} not found`);
   }
 
-  pauseTrack(id: string): Track | null {
+  async pauseTrack(id: string): Promise<Track | null> {
     const track = this.getTrackById(id);
     if (track) {
       if (!track.running) {
@@ -262,6 +285,7 @@ export class TrackService implements OnModuleInit {
       track.running = false;
       track.startTime = null;
       track.prevDuration = null;
+      await this.appComModule.updateClientsData();
       return track;
     }
     throw new NotFoundException(`Track with ID ${id} not found`);

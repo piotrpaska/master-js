@@ -4,7 +4,7 @@ import { TrackModule } from 'src/track/track.module';
 import { DeviceModule } from 'src/device/device.module';
 
 @Module({
-  imports: [TrackModule, forwardRef(() => DeviceModule)],
+  imports: [forwardRef(() => TrackModule), forwardRef(() => DeviceModule)],
   providers: [AppComGateway],
   exports: [AppComGateway],
 })
