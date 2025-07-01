@@ -1,11 +1,16 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Device } from './interfaces/device.interface';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { ConfigService } from 'src/config/config.service';
+import { AppComGateway } from 'src/app_com/app_com.gateway';
 
 @Injectable()
 export class DeviceService implements OnModuleInit {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(forwardRef(() => AppComGateway))
+    private readonly appComGateway: AppComGateway,
+  ) {}
 
   onModuleInit() {
     // Initialize devices from configuration or database if needed
@@ -42,6 +47,7 @@ export class DeviceService implements OnModuleInit {
       liveConnected: false,
     };
     this.devices.push(newDevice);
+    this.appComGateway.updateClientsData();
     return newDevice;
   }
 
@@ -51,6 +57,7 @@ export class DeviceService implements OnModuleInit {
       throw new Error(`Device with id ${id} not found.`);
     }
     device.lastHeartbeat = heartbeat;
+    this.appComGateway.updateClientsData();
     return device;
   }
 
@@ -60,6 +67,7 @@ export class DeviceService implements OnModuleInit {
       throw new Error(`Device with id ${id} not found.`);
     }
     device.liveConnected = isConnected;
+    this.appComGateway.updateClientsData();
     return device;
   }
 }

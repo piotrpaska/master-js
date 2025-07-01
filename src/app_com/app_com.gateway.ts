@@ -1,3 +1,4 @@
+import { forwardRef, Inject } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -17,6 +18,7 @@ import { TrackService } from 'src/track/track.service';
 export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly trackService: TrackService,
+    @Inject(forwardRef(() => DeviceService))
     private readonly deviceService: DeviceService,
   ) {}
 
