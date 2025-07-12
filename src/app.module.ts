@@ -12,6 +12,8 @@ import { SensorModule } from './sensor/sensor.module';
 import { DeviceModule } from './device/device.module';
 import { SpeakerModule } from './speaker/speaker.module';
 import { AppComModule } from './app_com/app_com.module';
+import { StartSequenceModule } from './start_sequence/start_sequence.module';
+import { CountdownModule } from './countdown/countdown.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { AppComModule } from './app_com/app_com.module';
     DeviceModule,
     SpeakerModule,
     AppComModule,
+    StartSequenceModule,
+    CountdownModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -140,7 +140,12 @@ export class TrackService implements OnModuleInit {
 
   async startAllTracks(startTime: number): Promise<Track[]> {
     const startedTracks = await Promise.all(
-      this.tracks.map((track) => this.startTrack(track.id, startTime)),
+      this.tracks.map(async (track) => {
+        return await this.startTrack(track.id, startTime).catch((error) => {
+          console.error(`Error starting track ${track.id}:`, error);
+          return null;
+        });
+      }),
     );
     await this.appComModule.updateClientsData();
     return startedTracks.filter(Boolean) as Track[];

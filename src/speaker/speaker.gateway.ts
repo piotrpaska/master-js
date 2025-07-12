@@ -6,8 +6,6 @@ import { Server } from 'ws';
 export class SpeakerGateway implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
-  private activeSpeakerTime: number | null = null;
-
   private wss: Server;
   onModuleInit() {
     if (!this.getSpeakerConfig().enabled) {
@@ -59,35 +57,16 @@ export class SpeakerGateway implements OnModuleInit {
     return this.configService.getConfig().speaker;
   }
 
-  updateStartTime(time: number): void {
-    if (!this.wss || this.wss.clients.size === 0) {
-      console.warn('No connected speakers to send start time');
+  updateSpeakersStartTime(startTime: number | null) {
+    if (!this.wss) {
+      console.error('WebSocket server is not initialized');
       return;
     }
 
-    this.activeSpeakerTime = time;
-
     this.wss.clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
-        client.send(this.activeSpeakerTime!.toString());
+        client.send(startTime?.toString() || '');
       }
     });
-  }
-
-  stopActiveSound(): void {
-    if (!this.wss || this.wss.clients.size === 0) {
-      console.warn('No connected speakers to stop sound');
-      return;
-    }
-    this.activeSpeakerTime = null;
-    this.wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN) {
-        client.send('stop');
-      }
-    });
-  }
-
-  getActiveSpeakerTime(): number | null {
-    return this.activeSpeakerTime;
   }
 }

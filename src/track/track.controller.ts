@@ -45,11 +45,9 @@ export class TrackController {
 
   @Put('/start-all')
   startAllTracks() {
-    try {
-      this.speakerGateway.updateStartTime(Date.now() + 10000);
-    } catch (error) {
-      throw new NotFoundException(error);
-    }
+    throw new Error(
+      'This method is not implemented yet. Please use the start sequence service instead.',
+    );
   }
 
   @Put(':id/pause')
