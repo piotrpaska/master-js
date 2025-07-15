@@ -36,7 +36,7 @@ export class TrackService implements OnModuleInit {
     );
   }
 
-  private tracks: Track[] = [];
+  tracks: Track[] = [];
 
   createTrack(data: CreateTrackDto): Track {
     const newTrack: Track = {
@@ -53,11 +53,14 @@ export class TrackService implements OnModuleInit {
   }
 
   getTracks(): Track[] {
-    return this.tracks;
+    return this.tracks.map((track) => ({
+      ...track,
+      elapsedTime: track.startTime ? Date.now() - track.startTime : 0,
+    }));
   }
 
   async getTracksWithEntryData(): Promise<
-    (Track & { entry: EntryModel | null })[]
+    (Track & { entry: EntryModel | null; elapsedTime: number })[]
   > {
     return Promise.all(
       this.tracks.map(async (track) => {
@@ -71,18 +74,28 @@ export class TrackService implements OnModuleInit {
         return {
           ...track,
           entry: entry,
+          elapsedTime: track.startTime ? Date.now() - track.startTime : 0,
         };
       }),
     );
   }
 
-  getTrackById(id: string): Track | undefined {
-    return this.tracks.find((track) => track.id === id);
+  getTrackById(id: string): (Track & { elapsedTime: number }) | undefined {
+    const track = this.tracks.find((track) => track.id === id);
+    if (track) {
+      return {
+        ...track,
+        elapsedTime: track.startTime ? Date.now() - track.startTime : 0,
+      };
+    }
+    return undefined;
   }
 
   async getTrackWithEntryDataById(
     id: string,
-  ): Promise<(Track & { entry: EntryModel | null }) | null> {
+  ): Promise<
+    (Track & { entry: EntryModel | null; elapsedTime: number }) | null
+  > {
     const track = this.getTrackById(id);
     if (!track) {
       return Promise.resolve(null);
@@ -94,6 +107,7 @@ export class TrackService implements OnModuleInit {
     return {
       ...track,
       entry: entry,
+      elapsedTime: track.startTime ? Date.now() - track.startTime : 0,
     };
   }
 
@@ -138,29 +152,23 @@ export class TrackService implements OnModuleInit {
     return null;
   }
 
-  async startAllTracks(startTime: number): Promise<Track[]> {
-    const startedTracks = await Promise.all(
-      this.tracks.map(async (track) => {
-        return await this.startTrack(track.id, startTime).catch((error) => {
-          console.error(`Error starting track ${track.id}:`, error);
-          return null;
-        });
-      }),
-    );
+  async startAllTracks(startTime: number): Promise<void> {
+    for (const track of this.tracks) {
+      await this.startTrack(track.id, startTime);
+    }
     await this.appComModule.updateClientsData();
-    return startedTracks.filter(Boolean) as Track[];
   }
 
   async startTrack(id: string, startTime: number): Promise<Track | null> {
-    const track = this.getTrackById(id);
+    const track = this.tracks.find((track) => track.id === id);
     if (track) {
       if (track.running) {
         throw new Error(`Track with ID ${id} is already running`);
       }
 
-      if (track.entryId === null) {
+      /*if (track.entryId === null) {
         throw new Error(`Track with ID ${id} has no entry assigned`);
-      }
+      }*/
 
       track.startTime = startTime;
       track.running = true;
@@ -175,7 +183,7 @@ export class TrackService implements OnModuleInit {
     id: string,
     endTime: number,
   ): Promise<Track | null> {
-    const track = this.getTrackById(id);
+    const track = this.tracks.find((track) => track.id === id);
     if (track) {
       if (!track.running) {
         throw new Error(`Track with ID ${id} is not running`);
@@ -230,7 +238,7 @@ export class TrackService implements OnModuleInit {
     id: string,
     status: RecordStatus,
   ): Promise<Track | null> {
-    const track = this.getTrackById(id);
+    const track = this.tracks.find((track) => track.id === id);
     if (track) {
       if (!track.running) {
         throw new Error(`Track with ID ${id} is not running`);
@@ -281,7 +289,7 @@ export class TrackService implements OnModuleInit {
   }
 
   async pauseTrack(id: string): Promise<Track | null> {
-    const track = this.getTrackById(id);
+    const track = this.tracks.find((track) => track.id === id);
     if (track) {
       if (!track.running) {
         throw new Error(`Track with ID ${id} is not running`);

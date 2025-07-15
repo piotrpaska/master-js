@@ -25,16 +25,16 @@ export class StartSequenceService {
         if (this.tracksStartTime !== null) {
           this.trackService
             .startAllTracks(this.tracksStartTime)
-            .then(() => {
+            .then((tracks) => {
               // Tracks started
+              console.log('Tracks started successfully:', tracks);
+              this.stopSequence();
             })
             .catch((err) => {
               console.error('Error starting tracks:', err);
+              this.stopSequence();
             });
         }
-        this.startTimeoutId = null;
-        this.tracksStartTime = null;
-        this.speakerGateway.updateSpeakersStartTime(null);
       }, this.startDelay);
 
       console.log(

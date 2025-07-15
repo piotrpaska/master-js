@@ -17,8 +17,8 @@ export class TrackController {
   ) {}
 
   @Get()
-  async getTracks() {
-    return this.trackService.getTracksWithEntryData();
+  getTracks() {
+    return this.trackService.getTracks();
   }
 
   @Get(':id')
