@@ -50,6 +50,15 @@ export class TrackController {
     );
   }
 
+  @Put(':id/start')
+  async startTrack(@Param('id') id: string) {
+    const track = await this.trackService.startTrack(id, Date.now());
+    if (!track) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    return track;
+  }
+
   @Put(':id/pause')
   pauseTrack(@Param('id') id: string) {
     try {
@@ -62,7 +71,7 @@ export class TrackController {
   @Put(':id/incident')
   async stopTrackWithIncident(
     @Param('id') id: string,
-    @Body('incident') incident: { status: 'OK' | 'DNS' | 'DNF' | 'DSQ' },
+    @Body() incident: { status: 'OK' | 'DNS' | 'DNF' | 'DSQ' },
   ) {
     const track = await this.trackService.stopTrackWithIncidentAndSave(
       id,
