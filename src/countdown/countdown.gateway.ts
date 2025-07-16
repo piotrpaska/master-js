@@ -7,7 +7,6 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway(3002, {
   transports: ['websocket'],
-  cors: true,
 })
 export class CountdownGateway implements OnGatewayConnection {
   @WebSocketServer()
