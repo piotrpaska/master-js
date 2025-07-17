@@ -1,10 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, StartList } from 'generated/prisma';
+import { AppComGateway } from 'src/app_com/app_com.gateway';
 
 @Injectable()
 export class StartListService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => AppComGateway))
+    private appComGateway: AppComGateway,
+  ) {}
+
+  private activeStartListId: string | null = null;
+
+  async setActiveStartListId(id: string | null): Promise<string | null> {
+    this.activeStartListId = id;
+    await this.appComGateway.updateClientsData();
+    return this.activeStartListId;
+  }
+
+  getActiveStartListId(): string | null {
+    return this.activeStartListId;
+  }
+
+  async getActiveStartList(): Promise<StartList | null> {
+    if (!this.activeStartListId) {
+      return null;
+    }
+    return this.prisma.startList.findUnique({
+      where: { id: this.activeStartListId },
+      include: {
+        entries: {
+          include: {
+            athlete: true,
+          },
+        },
+        records: {
+          include: {
+            entry: {
+              include: {
+                athlete: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 
   async startList(
     startListWhereUniqueInput: Prisma.StartListWhereUniqueInput,

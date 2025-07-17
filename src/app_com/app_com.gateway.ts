@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { DeviceService } from 'src/device/device.service';
+import { StartListService } from 'src/start-list/start-list.service';
 import { TrackService } from 'src/track/track.service';
 
 @WebSocketGateway(3001, {
@@ -21,6 +22,8 @@ export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly trackService: TrackService,
     @Inject(forwardRef(() => DeviceService))
     private readonly deviceService: DeviceService,
+    @Inject(forwardRef(() => StartListService))
+    private readonly startListService: StartListService,
   ) {}
 
   async handleConnection() {
@@ -55,6 +58,10 @@ export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return JSON.stringify({
           devices: this.deviceService.getAllDevices(),
         });
+      case 'activeStartList':
+        return JSON.stringify({
+          activeStartList: await this.startListService.getActiveStartList(),
+        });
       default:
         return JSON.stringify({
           error: 'Invalid specified type. Use "tracks" or "devices".',
@@ -66,6 +73,7 @@ export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('data', {
       tracks: await this.trackService.getTracksWithEntryData(),
       devices: this.deviceService.getAllDevices(),
+      activeStartList: await this.startListService.getActiveStartList(),
     });
   }
 }

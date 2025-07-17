@@ -22,7 +22,7 @@ export class StartListController {
     });
   }
 
-  @Get(':id')
+  @Get('/one/:id')
   async getStartListById(@Param('id') id: string) {
     const startList = await this.startListService.startList(
       { id },
@@ -39,6 +39,35 @@ export class StartListController {
     
     throw Error('Not implemented yet');
   }*/
+
+  @Get('active')
+  async getActiveStartList() {
+    const activeStartListId = this.startListService.getActiveStartListId();
+    if (!activeStartListId) {
+      throw new NotFoundException('No active start list set');
+    }
+    const activeStartList = await this.startListService.getActiveStartList();
+    if (!activeStartList) {
+      throw new NotFoundException(
+        `Active start list with id ${activeStartListId} not found`,
+      );
+    }
+    return activeStartList;
+  }
+
+  @Put('active/:id')
+  async setActiveStartList(@Param('id') id: string) {
+    const startList = await this.startListService.startList({ id });
+    if (!startList) {
+      throw new NotFoundException(`Start list with id ${id} not found`);
+    }
+    return await this.startListService.setActiveStartListId(id);
+  }
+
+  @Put('active-reset')
+  async resetActiveStartList() {
+    return await this.startListService.setActiveStartListId(null);
+  }
 
   @Post()
   async createStartList(@Body() data: CreateStartListDto) {
