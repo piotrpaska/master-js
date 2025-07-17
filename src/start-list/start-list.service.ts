@@ -13,10 +13,20 @@ export class StartListService {
 
   private activeStartListId: string | null = null;
 
-  async setActiveStartListId(id: string | null): Promise<string | null> {
+  async setActiveStartListId(id: string): Promise<string> {
+    const startList = await this.startList({ id });
+    if (!startList) {
+      throw new Error(`Start list with id ${id} not found`);
+    }
+
     this.activeStartListId = id;
     await this.appComGateway.updateClientsData();
     return this.activeStartListId;
+  }
+
+  async resetActiveStartList(): Promise<void> {
+    this.activeStartListId = null;
+    await this.appComGateway.updateClientsData();
   }
 
   getActiveStartListId(): string | null {

@@ -22,7 +22,7 @@ export class StartListController {
     });
   }
 
-  @Get('/one/:id')
+  @Get('/:id')
   async getStartListById(@Param('id') id: string) {
     const startList = await this.startListService.startList(
       { id },
@@ -55,7 +55,7 @@ export class StartListController {
     return activeStartList;
   }
 
-  @Put('active/:id')
+  @Put(':id/activate')
   async setActiveStartList(@Param('id') id: string) {
     const startList = await this.startListService.startList({ id });
     if (!startList) {
@@ -66,7 +66,7 @@ export class StartListController {
 
   @Put('active-reset')
   async resetActiveStartList() {
-    return await this.startListService.setActiveStartListId(null);
+    return await this.startListService.resetActiveStartList();
   }
 
   @Post()
