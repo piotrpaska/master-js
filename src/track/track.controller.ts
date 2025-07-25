@@ -43,6 +43,15 @@ export class TrackController {
     return this.trackService.assignEntryIdToTrack(id, entryId);
   }
 
+  @Put(':id/unassign-entry')
+  async unassignEntryFromTrack(@Param('id') id: string) {
+    const track = await this.trackService.getTrackWithEntryDataById(id);
+    if (!track) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    return this.trackService.unassignEntryIdFromTrack(id);
+  }
+
   @Put('/start-all')
   startAllTracks() {
     throw new Error(

@@ -142,9 +142,27 @@ export class TrackService implements OnModuleInit {
     id: string,
     entryId: string | null,
   ): Promise<Track | null> {
-    const track = this.getTrackById(id);
+    const track = this.tracks.find((track) => track.id === id);
     if (track) {
+      if (this.tracks.some((t) => t.entryId === entryId && t.id !== id)) {
+        throw new Error(
+          `Entry with ID ${entryId} is already assigned to another track`,
+        );
+      }
+
       track.entryId = entryId;
+
+      await this.appComModule.updateClientsData();
+      return track;
+    }
+    await this.appComModule.updateClientsData();
+    return null;
+  }
+
+  async unassignEntryIdFromTrack(id: string): Promise<Track | null> {
+    const track = this.tracks.find((track) => track.id === id);
+    if (track) {
+      track.entryId = null;
       await this.appComModule.updateClientsData();
       return track;
     }

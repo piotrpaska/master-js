@@ -61,7 +61,7 @@ export class EntryController {
   }
 
   @Delete(':id')
-  async deleteEntry(@Param() id: string) {
+  async deleteEntry(@Param('id') id: string) {
     return this.entryService.deleteEntry({ id });
   }
 }

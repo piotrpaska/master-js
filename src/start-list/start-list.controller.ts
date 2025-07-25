@@ -18,7 +18,12 @@ export class StartListController {
   @Get()
   async getStartList() {
     return this.startListService.startLists({
-      include: { entries: true, records: true },
+      include: {
+        entries: {
+          include: { athlete: true },
+        },
+        records: true,
+      },
     });
   }
 
@@ -26,7 +31,12 @@ export class StartListController {
   async getStartListById(@Param('id') id: string) {
     const startList = await this.startListService.startList(
       { id },
-      { entries: true, records: true },
+      {
+        entries: {
+          include: { athlete: true },
+        },
+        records: true,
+      },
     );
     if (!startList) {
       throw new NotFoundException(`Start list with id ${id} not found`);
