@@ -16,6 +16,7 @@ import { AppComGateway } from 'src/app_com/app_com.gateway';
 @Injectable()
 export class TrackService implements OnModuleInit {
   constructor(
+    @Inject(forwardRef(() => EntryService))
     private entryService: EntryService,
     private recordService: RecordService,
     private configService: ConfigService,

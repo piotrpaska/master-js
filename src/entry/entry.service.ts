@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Entry } from 'generated/prisma';
+import { AppComGateway } from 'src/app_com/app_com.gateway';
 
 @Injectable()
 export class EntryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => AppComGateway))
+    private appComGateway: AppComGateway,
+  ) {}
 
   async entry(
     entryWhereUniqueInput: Prisma.EntryWhereUniqueInput,
@@ -45,10 +50,13 @@ export class EntryService {
     where: Prisma.EntryWhereUniqueInput,
     data: Prisma.EntryUpdateInput,
   ): Promise<Entry> {
-    return this.prisma.entry.update({
+    const entry = await this.prisma.entry.update({
       where,
       data,
     });
+
+    await this.appComGateway.updateClientsData();
+    return entry;
   }
 
   async deleteEntry(where: Prisma.EntryWhereUniqueInput): Promise<Entry> {
@@ -60,22 +68,40 @@ export class EntryService {
   async markEntryAsStarted(
     where: Prisma.EntryWhereUniqueInput,
   ): Promise<Entry> {
-    return this.prisma.entry.update({
+    const entry = await this.prisma.entry.update({
       where,
       data: {
         alreadyStarted: true,
       },
     });
+    await this.appComGateway.updateClientsData();
+    return entry;
   }
 
   async markEntryAsNotStarted(
-    where: Prisma.EntryWhereUniqueInput,
+    where: Prisma.EntryWhereUniqueInput | undefined,
   ): Promise<Entry> {
-    return this.prisma.entry.update({
-      where,
+    const entry = await this.prisma.entry.update({
+      where: where || { id: undefined },
       data: {
         alreadyStarted: false,
       },
     });
+    await this.appComGateway.updateClientsData();
+    return entry;
+  }
+
+  async markEntriesOfStartListAsNotStarted(
+    startListId: string,
+  ): Promise<Entry[]> {
+    await this.prisma.entry.updateMany({
+      where: { startListId },
+      data: { alreadyStarted: false },
+    });
+    const entries = await this.prisma.entry.findMany({
+      where: { startListId },
+    });
+    await this.appComGateway.updateClientsData();
+    return entries;
   }
 }

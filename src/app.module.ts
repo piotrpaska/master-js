@@ -19,6 +19,7 @@ import { CountdownModule } from './countdown/countdown.module';
   imports: [
     PrismaModule,
     AthleteModule,
+    AppComModule,
     RecordModule,
     EntryModule,
     StartListModule,
@@ -27,7 +28,6 @@ import { CountdownModule } from './countdown/countdown.module';
     SensorModule,
     DeviceModule,
     SpeakerModule,
-    AppComModule,
     StartSequenceModule,
     CountdownModule,
   ],

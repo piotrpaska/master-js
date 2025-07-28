@@ -41,23 +41,23 @@ export class EntryController {
   }
 
   @Put(':id')
-  async updateEntry(@Param() id: string, @Body() data: CreateEntryDto) {
+  async updateEntry(@Param('id') id: string, @Body() data: CreateEntryDto) {
     return this.entryService.updateEntry({ id }, data);
   }
 
   @Put(':id/mark-started')
-  async markEntryAsStarted(@Param() id: string) {
+  async markEntryAsStarted(@Param('id') id: string) {
     return this.entryService.markEntryAsStarted({ id });
   }
 
   @Put(':id/restore')
-  async restore(@Param() id: string) {
+  async restore(@Param('id') id: string) {
     return this.entryService.markEntryAsNotStarted({ id });
   }
 
-  @Put('/restore-all')
-  async restoreAll() {
-    return this.entryService.markEntryAsNotStarted({ id: undefined });
+  @Put('/restore-start-list/:id')
+  async restoreAll(@Param('id') id: string) {
+    return this.entryService.markEntriesOfStartListAsNotStarted(id);
   }
 
   @Delete(':id')

@@ -11,7 +11,7 @@ import { AppComModule } from 'src/app_com/app_com.module';
 @Module({
   imports: [
     PrismaModule,
-    EntryModule,
+    forwardRef(() => EntryModule),
     RecordModule,
     ConfigModule,
     SpeakerModule,
