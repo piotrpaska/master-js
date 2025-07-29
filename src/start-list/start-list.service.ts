@@ -3,6 +3,17 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, StartList } from 'generated/prisma';
 import { AppComGateway } from 'src/app_com/app_com.gateway';
 
+// Extend the BigInt interface to include toJSON
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+
+BigInt.prototype.toJSON = function (this: bigint): string {
+  return this.toString();
+};
+
 @Injectable()
 export class StartListService {
   constructor(

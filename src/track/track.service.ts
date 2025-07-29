@@ -185,10 +185,9 @@ export class TrackService implements OnModuleInit {
         throw new Error(`Track with ID ${id} is already running`);
       }
 
-      // TODO: Uncomment if you finish demo
-      /*if (track.entryId === null) {
+      if (track.entryId === null) {
         throw new Error(`Track with ID ${id} has no entry assigned`);
-      }*/
+      }
 
       track.startTime = startTime;
       track.running = true;
@@ -208,17 +207,17 @@ export class TrackService implements OnModuleInit {
       if (!track.running) {
         throw new Error(`Track with ID ${id} is not running`);
       }
-      //TODO: Uncomment if you finish demo
-      /*if (track.entryId === null) {
+
+      if (track.entryId === null) {
         throw new Error(`Track with ID ${id} has no entry assigned`);
-      }*/
+      }
 
       if (track.startTime === null || track.startTime === 0) {
         throw new Error(`Track with ID ${id} has not been started`);
       }
 
-      //const entryId = track.entryId;
-      //const startTime = track.startTime;
+      const entryId = track.entryId;
+      const startTime = track.startTime;
       const duration = endTime - track.startTime;
 
       track.running = false;
@@ -226,7 +225,7 @@ export class TrackService implements OnModuleInit {
       track.startTime = null;
       track.entryId = null;
 
-      /*const entry = await this.entryService.entry({ id: entryId });
+      const entry = await this.entryService.entry({ id: entryId });
 
       if (!entry) {
         throw new NotFoundException(`Entry with ID ${entryId} not found`);
@@ -247,7 +246,7 @@ export class TrackService implements OnModuleInit {
         startList: { connect: { id: entry.startListId } },
       });
 
-      track.relatedLastRecordId = record.id;*/
+      track.relatedLastRecordId = record.id;
       await this.appComModule.updateClientsData();
       return track;
     }
