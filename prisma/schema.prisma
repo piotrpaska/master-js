@@ -41,9 +41,9 @@ model Record {
   status RecordStatus @default(OK)
   timestamp DateTime @default(now())
   
-  startList StartList @relation(fields: [startListId], references: [id])
+  startList StartList @relation(fields: [startListId], references: [id], onDelete: Cascade)
 
-  entry Entry @relation(fields: [entryId], references: [id])
+  entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 }
 
 /*model Device {

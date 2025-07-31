@@ -17,14 +17,7 @@ export class StartListController {
 
   @Get()
   async getStartList() {
-    return this.startListService.startLists({
-      include: {
-        entries: {
-          include: { athlete: true },
-        },
-        records: true,
-      },
-    });
+    return this.startListService.startLists({});
   }
 
   @Get('/:id')
@@ -35,7 +28,9 @@ export class StartListController {
         entries: {
           include: { athlete: true },
         },
-        records: true,
+        records: {
+          include: { entry: { include: { athlete: true } } },
+        },
       },
     );
     if (!startList) {

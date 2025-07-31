@@ -14,7 +14,9 @@ import { TrackService } from 'src/track/track.service';
 
 @WebSocketGateway(3001, {
   transports: ['websocket'],
-  cors: true,
+  cors: {
+    origin: '*',
+  },
 })
 export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
