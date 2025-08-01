@@ -1,56 +1,50 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit, Request } from '@nestjs/common';
+import {
+  OnGatewayConnection,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { ConfigService } from 'src/config/config.service';
-import { Server } from 'ws';
+import { Server, Socket } from 'socket.io';
+import { DeviceService } from 'src/device/device.service';
 
-@Injectable()
-export class SpeakerGateway implements OnModuleInit {
-  constructor(private readonly configService: ConfigService) {}
+@WebSocketGateway(new ConfigService().getConfig().ports.speaker, {
+  cors: {
+    origin: '*',
+  },
+})
+export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly deviceService: DeviceService,
+  ) {}
 
+  @WebSocketServer()
   private wss: Server;
+
   onModuleInit() {
     if (!this.getSpeakerConfig().enabled) {
       console.log('Speaker is disabled in the configuration');
       return;
     }
+  }
 
-    this.wss = new Server({
-      port: this.configService.getConfig().ports.speaker,
-    });
+  handleConnection(client: Socket) {
+    console.log(`Client connected: ${client.id}`);
 
-    this.wss.on('listening', () => {
-      console.log(
-        `Speaker WebSocket server is listening on port ${this.configService.getConfig().ports.speaker}`,
+    /*if (!clientId) {
+      console.error('Client ID not provided in the request URL');
+      client.disconnect();
+      return;
+    }
+
+    if (this.getSpeakerConfig().id !== clientId) {
+      console.error(
+        `Client ID ${clientId} does not match configured speaker ID ${this.getSpeakerConfig().id}`,
       );
-    });
-
-    this.wss.on('connection', (ws, req) => {
-      console.log('New speaker connected');
-
-      const clientId = req.url?.split('/').pop() || null;
-
-      if (!clientId) {
-        console.error('Client ID not provided in the request URL');
-        ws.close();
-        return;
-      }
-
-      if (this.getSpeakerConfig().id !== clientId) {
-        console.error(
-          `Client ID ${clientId} does not match configured speaker ID ${this.getSpeakerConfig().id}`,
-        );
-        ws.close();
-        return;
-      }
-
-      ws.on('message', (message: string) => {
-        console.log(`Received message from speaker: ${message}`);
-        // Handle incoming messages from the speaker if needed
-      });
-
-      ws.on('close', () => {
-        console.log(`Speaker ${clientId} disconnected`);
-      });
-    });
+      client.disconnect();
+      return;
+    }*/
   }
 
   private getSpeakerConfig() {
@@ -63,10 +57,10 @@ export class SpeakerGateway implements OnModuleInit {
       return;
     }
 
-    this.wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN) {
-        client.send(startTime?.toString() || '');
-      }
-    });
+    this.wss.emit('speakersStartTime', startTime);
+  }
+
+  clearSpeakersStartTime() {
+    this.wss.emit('clearSpeakersStartTime');
   }
 }

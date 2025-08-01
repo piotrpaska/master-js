@@ -48,7 +48,7 @@ export class StartSequenceService {
   stopSequence() {
     if (this.tracksStartTime !== null) {
       this.tracksStartTime = null;
-      this.speakerGateway.updateSpeakersStartTime(null);
+      this.speakerGateway.clearSpeakersStartTime();
       this.countdownGateway.stopCountdown();
       if (this.startTimeoutId) {
         clearTimeout(this.startTimeoutId);
