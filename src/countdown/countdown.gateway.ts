@@ -4,8 +4,9 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ConfigService } from 'src/config/config.service';
 
-@WebSocketGateway(3002, {
+@WebSocketGateway(new ConfigService().getConfig().ports.countdown, {
   transports: ['websocket'],
 })
 export class CountdownGateway implements OnGatewayConnection {

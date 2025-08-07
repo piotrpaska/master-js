@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Config, TrackConfig } from './interfaces/config.interface';
 import * as fs from 'fs';
 import { load } from 'js-yaml';
 import { z } from 'zod';
@@ -7,11 +6,10 @@ import { z } from 'zod';
 const configSchema = z
   .object({
     ports: z.object({
-      http: z.number().int().positive(),
       sensors: z.number().int().positive(),
       speaker: z.number().int().positive(),
-      tracks: z.number().int().positive(),
-      devices: z.number().int().positive(),
+      app_com: z.number().int().positive(),
+      countdown: z.number().int().positive(),
     }),
     speaker: z.object({
       enabled: z.boolean(),
@@ -34,6 +32,8 @@ const configSchema = z
     ),
   })
   .strict();
+
+type Config = z.infer<typeof configSchema>;
 
 @Injectable()
 export class ConfigService {
@@ -63,7 +63,7 @@ export class ConfigService {
       }
       this.config = parsedConfig.data as unknown as Config; // Assign validated config with double cast
 
-      const tracks: TrackConfig[] = this.config.tracks;
+      const tracks: Config['tracks'] = this.config.tracks;
 
       this.sensorsWithTrack = tracks
         .map((track) => {

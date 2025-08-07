@@ -8,11 +8,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { ConfigService } from 'src/config/config.service';
 import { DeviceService } from 'src/device/device.service';
 import { StartListService } from 'src/start-list/start-list.service';
 import { TrackService } from 'src/track/track.service';
 
-@WebSocketGateway(3001, {
+@WebSocketGateway(new ConfigService().getConfig().ports.app_com, {
   transports: ['websocket'],
   cors: {
     origin: '*',
