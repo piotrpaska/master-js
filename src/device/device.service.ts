@@ -12,13 +12,13 @@ export class DeviceService implements OnModuleInit {
     private readonly appComGateway: AppComGateway,
   ) {}
 
-  onModuleInit() {
+  async onModuleInit() {
     // Initialize devices from configuration or database if needed
     const initialDevices = this.configService.getInitialDevices();
     if (initialDevices) {
       for (const device of initialDevices) {
         try {
-          this.registerDevice(device);
+          await this.registerDevice(device);
         } catch (error) {
           console.error(`Failed to register device ${device.id}:`, error);
         }
@@ -36,7 +36,7 @@ export class DeviceService implements OnModuleInit {
     return this.devices.find((device) => device.id === id);
   }
 
-  registerDevice(data: CreateDeviceDto): Device {
+  async registerDevice(data: CreateDeviceDto): Promise<Device> {
     const existingDevice = this.getDeviceById(data.id);
     if (existingDevice) {
       throw new Error(`Device with id ${data.id} already exists.`);
@@ -47,27 +47,33 @@ export class DeviceService implements OnModuleInit {
       liveConnected: false,
     };
     this.devices.push(newDevice);
-    this.appComGateway.updateClientsData();
+    await this.appComGateway.updateClientsData();
     return newDevice;
   }
 
-  updateHeartbeat(id: string, heartbeat: Date): Device | undefined {
+  async updateHeartbeat(
+    id: string,
+    heartbeat: Date,
+  ): Promise<Device | undefined> {
     const device = this.getDeviceById(id);
     if (!device) {
       throw new Error(`Device with id ${id} not found.`);
     }
     device.lastHeartbeat = heartbeat;
-    this.appComGateway.updateClientsData();
+    await this.appComGateway.updateClientsData();
     return device;
   }
 
-  setLiveConnection(id: string, isConnected: boolean): Device | undefined {
+  async setLiveConnection(
+    id: string,
+    isConnected: boolean,
+  ): Promise<Device | undefined> {
     const device = this.getDeviceById(id);
     if (!device) {
       throw new Error(`Device with id ${id} not found.`);
     }
     device.liveConnected = isConnected;
-    this.appComGateway.updateClientsData();
+    await this.appComGateway.updateClientsData();
     return device;
   }
 }

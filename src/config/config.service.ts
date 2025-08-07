@@ -21,13 +21,14 @@ const configSchema = z
         id: z.string(),
         name: z.string(),
         color: z.string(),
-        sensors: z.array(
-          z.object({
-            id: z.string(),
-            name: z.string(),
-            type: z.enum(['start', 'finish']),
-          }),
-        ),
+      }),
+    ),
+    sensors: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        type: z.enum(['start', 'finish']),
+        trackId: z.string(),
       }),
     ),
   })
@@ -38,10 +39,6 @@ type Config = z.infer<typeof configSchema>;
 @Injectable()
 export class ConfigService {
   private config: Config;
-  private sensorsWithTrack: Map<
-    string,
-    { trackId: string; sensorType: 'start' | 'finish' }
-  >;
 
   constructor() {
     this.loadConfig(); // Ensure config is loaded as soon as the service is instantiated
@@ -63,28 +60,7 @@ export class ConfigService {
       }
       this.config = parsedConfig.data as unknown as Config; // Assign validated config with double cast
 
-      const tracks: Config['tracks'] = this.config.tracks;
-
-      this.sensorsWithTrack = tracks
-        .map((track) => {
-          return track.sensors.map((sensor) => ({
-            id: sensor.id,
-            trackId: track.id,
-            sensorType: sensor.type,
-          }));
-        })
-        .reduce((acc, curr) => {
-          curr.forEach((sensor) => {
-            acc.set(sensor.id, {
-              trackId: sensor.trackId,
-              sensorType: sensor.sensorType,
-            });
-          });
-          return acc;
-        }, new Map<string, { trackId: string; sensorType: 'start' | 'finish' }>());
-
       console.log('Config loaded successfully:', this.config);
-      console.log('Sensors with track mapping:', this.sensorsWithTrack);
     } catch (e) {
       console.error('Error loading config file:', e);
       process.exit(1); // Exit if config cannot be loaded
@@ -100,13 +76,15 @@ export class ConfigService {
   }
 
   getTrackIdBySensorId(sensorId: string): string | null {
-    const sensorInfo = this.sensorsWithTrack.get(sensorId);
-    return sensorInfo ? sensorInfo.trackId : null;
+    const sensor = this.config.sensors.find((sensor) => sensor.id === sensorId);
+    return sensor ? sensor.trackId : null;
   }
 
   getSensorTypeById(sensorId: string): 'start' | 'finish' | null {
-    const sensorInfo = this.sensorsWithTrack.get(sensorId);
-    return sensorInfo ? sensorInfo.sensorType : null;
+    const sensorInfo = this.config.sensors.find(
+      (sensor) => sensor.id === sensorId,
+    );
+    return sensorInfo ? sensorInfo.type : null;
   }
 
   getInitialDevices(): {
@@ -114,13 +92,11 @@ export class ConfigService {
     name: string;
     type: 'sensor' | 'speaker';
   }[] {
-    const sensors = this.config.tracks.flatMap((track) =>
-      track.sensors.map((sensor) => ({
-        id: sensor.id,
-        name: sensor.name,
-        type: 'sensor' as const,
-      })),
-    );
+    const sensors = this.config.sensors.map((sensor) => ({
+      id: sensor.id,
+      name: sensor.name,
+      type: 'sensor' as const,
+    }));
     const speaker = this.config.speaker.enabled
       ? [
           {

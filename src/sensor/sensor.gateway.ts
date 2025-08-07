@@ -42,7 +42,7 @@ export class SensorGateway implements OnModuleInit {
         return;
       }
 
-      this.deviceService.setLiveConnection(clientId, true);
+      void this.deviceService.setLiveConnection(clientId, true);
 
       ws.on('message', (message: string) => {
         console.log(`Received message from sensor: ${message}`);
@@ -73,7 +73,9 @@ export class SensorGateway implements OnModuleInit {
 
       ws.on('close', () => {
         console.log('Sensor disconnected');
-        this.deviceService.setLiveConnection(clientId, false);
+        this.deviceService.setLiveConnection(clientId, false).catch((err) => {
+          console.error('Error setting live connection to false:', err);
+        });
       });
     });
   }
@@ -95,7 +97,7 @@ export class SensorGateway implements OnModuleInit {
     }
 
     if (sensorType === 'start') {
-      this.trackService.startTrack(trackId, data.timestamp);
+      await this.trackService.startTrack(trackId, data.timestamp);
     } else if (sensorType === 'finish') {
       await this.trackService.stopTrackAndSaveTime(trackId, data.timestamp);
     } else {
