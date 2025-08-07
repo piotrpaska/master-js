@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -25,7 +27,7 @@ export class EntryController {
     try {
       return this.entryService.entry({ id });
     } catch {
-      return null;
+      throw new NotFoundException(`Entry with id ${id} not found`);
     }
   }
 
@@ -37,31 +39,61 @@ export class EntryController {
       bib: data.bib,
     };
 
-    return this.entryService.createEntry(entryCreateInput);
+    try {
+      return this.entryService.createEntry(entryCreateInput);
+    } catch {
+      throw new BadRequestException(`Failed to create entry`);
+    }
   }
 
   @Put(':id')
   async updateEntry(@Param('id') id: string, @Body() data: CreateEntryDto) {
-    return this.entryService.updateEntry({ id }, data);
+    try {
+      return this.entryService.updateEntry({ id }, data);
+    } catch {
+      throw new BadRequestException(`Failed to update entry`);
+    }
   }
 
   @Put(':id/mark-started')
   async markEntryAsStarted(@Param('id') id: string) {
-    return this.entryService.markEntryAsStarted({ id });
+    try {
+      return this.entryService.markEntryAsStarted({ id });
+    } catch {
+      throw new NotFoundException(
+        `Entry with id ${id} not found or already started`,
+      );
+    }
   }
 
   @Put(':id/restore')
   async restore(@Param('id') id: string) {
-    return this.entryService.markEntryAsNotStarted({ id });
+    try {
+      return this.entryService.markEntryAsNotStarted({ id });
+    } catch {
+      throw new NotFoundException(
+        `Entry with id ${id} not found or already restored`,
+      );
+    }
   }
 
   @Put('/restore-start-list/:id')
   async restoreAll(@Param('id') id: string) {
-    return this.entryService.markEntriesOfStartListAsNotStarted(id);
+    try {
+      return this.entryService.markEntriesOfStartListAsNotStarted(id);
+    } catch {
+      throw new NotFoundException(
+        `Start list with id ${id} not found or entries already restored`,
+      );
+    }
   }
 
   @Delete(':id')
   async deleteEntry(@Param('id') id: string) {
-    return this.entryService.deleteEntry({ id });
+    try {
+      return this.entryService.deleteEntry({ id });
+    } catch {
+      throw new NotFoundException(`Entry with id ${id} not found`);
+    }
   }
 }

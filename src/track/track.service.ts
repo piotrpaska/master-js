@@ -124,14 +124,14 @@ export class TrackService implements OnModuleInit {
     return track;
   }
 
-  async deleteTrack(id: string): Promise<boolean> {
+  async deleteTrack(id: string): Promise<Track | null> {
     const index = this.tracks.findIndex((track) => track.id === id);
     if (index !== -1) {
       this.tracks.splice(index, 1);
       await this.appComModule.updateClientsData();
-      return true;
+      return null;
     }
-    return false;
+    throw new NotFoundException(`Track with ID ${id} not found`);
   }
 
   async clearTracks(): Promise<void> {
@@ -157,7 +157,7 @@ export class TrackService implements OnModuleInit {
       return track;
     }
     await this.appComModule.updateClientsData();
-    return null;
+    throw new NotFoundException(`Track with ID ${id} not found`);
   }
 
   async unassignEntryIdFromTrack(id: string): Promise<Track | null> {
@@ -173,7 +173,11 @@ export class TrackService implements OnModuleInit {
 
   async startAllTracks(startTime: number): Promise<void> {
     for (const track of this.tracks) {
-      await this.startTrack(track.id, startTime);
+      try {
+        await this.startTrack(track.id, startTime);
+      } catch (error) {
+        console.error(`Failed to start track ${track.id}: ${error}`);
+      }
     }
     await this.appComModule.updateClientsData();
   }
