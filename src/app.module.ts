@@ -14,6 +14,7 @@ import { SpeakerModule } from './speaker/speaker.module';
 import { AppComModule } from './app_com/app_com.module';
 import { StartSequenceModule } from './start_sequence/start_sequence.module';
 import { CountdownModule } from './countdown/countdown.module';
+import { ResultsModule } from './results/results.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CountdownModule } from './countdown/countdown.module';
     SpeakerModule,
     StartSequenceModule,
     CountdownModule,
+    ResultsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

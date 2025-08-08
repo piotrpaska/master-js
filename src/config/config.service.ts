@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 const configSchema = z
   .object({
+    resultsDir: z.string(),
     ports: z.object({
       sensors: z.number().int().positive(),
       speaker: z.number().int().positive(),
