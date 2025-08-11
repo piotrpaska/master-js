@@ -63,4 +63,13 @@ export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
   clearSpeakersStartTime() {
     this.wss.emit('clearSpeakersStartTime');
   }
+
+  signalizeTrackStop() {
+    if (!this.wss) {
+      console.error('WebSocket server is not initialized');
+      return;
+    }
+
+    this.wss.emit('trackStop');
+  }
 }

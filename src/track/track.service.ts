@@ -12,6 +12,7 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { RecordService } from 'src/record/record.service';
 import { ConfigService } from 'src/config/config.service';
 import { AppComGateway } from 'src/app_com/app_com.gateway';
+import { SpeakerGateway } from 'src/speaker/speaker.gateway';
 
 @Injectable()
 export class TrackService implements OnModuleInit {
@@ -22,6 +23,7 @@ export class TrackService implements OnModuleInit {
     private configService: ConfigService,
     @Inject(forwardRef(() => AppComGateway))
     private appComModule: AppComGateway,
+    private readonly speakerService: SpeakerGateway,
   ) {}
 
   onModuleInit() {
@@ -219,6 +221,8 @@ export class TrackService implements OnModuleInit {
       if (track.startTime === null || track.startTime === 0) {
         throw new Error(`Track with ID ${id} has not been started`);
       }
+
+      this.speakerService.signalizeTrackStop();
 
       const entryId = track.entryId;
       const startTime = track.startTime;
