@@ -7,6 +7,7 @@ import { AppComGateway } from 'src/app_com/app_com.gateway';
 @Injectable()
 export class DeviceService implements OnModuleInit {
   constructor(
+    @Inject(forwardRef(() => ConfigService))
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => AppComGateway))
     private readonly appComGateway: AppComGateway,
@@ -27,6 +28,20 @@ export class DeviceService implements OnModuleInit {
   }
 
   private devices: Device[] = [];
+
+  async reInitDevices() {
+    this.devices = [];
+    const initialDevices = this.configService.getInitialDevices();
+    if (initialDevices) {
+      for (const device of initialDevices) {
+        try {
+          await this.registerDevice(device);
+        } catch (error) {
+          console.error(`Failed to register device ${device.id}:`, error);
+        }
+      }
+    }
+  }
 
   getAllDevices(): Device[] {
     return this.devices;

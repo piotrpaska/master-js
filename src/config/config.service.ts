@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import { load } from 'js-yaml';
 import { z } from 'zod';
 import * as yaml from 'js-yaml';
+import { TrackService } from 'src/track/track.service';
+import { DeviceService } from 'src/device/device.service';
 
 const configSchema = z
   .object({
@@ -42,7 +44,10 @@ type Config = z.infer<typeof configSchema>;
 export class ConfigService {
   private config: Config;
 
-  constructor() {
+  constructor(
+    private readonly trackService?: TrackService,
+    private readonly deviceService?: DeviceService,
+  ) {
     this.loadConfig(); // Ensure config is loaded as soon as the service is instantiated
   }
 
@@ -116,5 +121,7 @@ export class ConfigService {
 
     await fs.promises.writeFile('./config.yaml', yamlString, 'utf8');
     this.refreshConfig();
+    this.trackService?.reInitTracks();
+    await this.deviceService?.reInitDevices();
   }
 }

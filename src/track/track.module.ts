@@ -13,7 +13,7 @@ import { AppComModule } from 'src/app_com/app_com.module';
     PrismaModule,
     forwardRef(() => EntryModule),
     RecordModule,
-    ConfigModule,
+    forwardRef(() => ConfigModule),
     SpeakerModule,
     forwardRef(() => AppComModule),
   ],

@@ -20,6 +20,7 @@ export class TrackService implements OnModuleInit {
     @Inject(forwardRef(() => EntryService))
     private entryService: EntryService,
     private recordService: RecordService,
+    @Inject(forwardRef(() => ConfigService))
     private configService: ConfigService,
     @Inject(forwardRef(() => AppComGateway))
     private appComModule: AppComGateway,
@@ -40,6 +41,20 @@ export class TrackService implements OnModuleInit {
   }
 
   tracks: Track[] = [];
+
+  reInitTracks() {
+    this.tracks = [];
+    const config = this.configService.getConfig();
+    if (!config.tracks || config.tracks.length === 0) {
+      throw new Error('No tracks defined in the configuration');
+    }
+    this.tracks = config.tracks.map((trackConfig) =>
+      this.createTrack({
+        id: trackConfig.id,
+        name: trackConfig.name,
+      }),
+    );
+  }
 
   createTrack(data: CreateTrackDto): Track {
     const newTrack: Track = {

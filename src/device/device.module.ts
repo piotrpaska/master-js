@@ -5,7 +5,7 @@ import { DeviceService } from './device.service';
 import { AppComModule } from 'src/app_com/app_com.module';
 
 @Module({
-  imports: [ConfigModule, forwardRef(() => AppComModule)],
+  imports: [forwardRef(() => ConfigModule), forwardRef(() => AppComModule)],
   controllers: [DeviceController],
   providers: [DeviceService],
   exports: [DeviceService],

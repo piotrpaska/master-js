@@ -1,4 +1,4 @@
-import { OnModuleInit, Request } from '@nestjs/common';
+import { forwardRef, Inject, OnModuleInit, Request } from '@nestjs/common';
 import {
   OnGatewayConnection,
   WebSocketGateway,
@@ -8,13 +8,14 @@ import { ConfigService } from 'src/config/config.service';
 import { Server, Socket } from 'socket.io';
 import { DeviceService } from 'src/device/device.service';
 
-@WebSocketGateway(new ConfigService().getConfig().ports.speaker, {
+@WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
 export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
   constructor(
+    @Inject(forwardRef(() => ConfigService))
     private readonly configService: ConfigService,
     private readonly deviceService: DeviceService,
   ) {}
@@ -23,6 +24,10 @@ export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
   private wss: Server;
 
   onModuleInit() {
+    const port = this.configService.getConfig().ports.speaker;
+    if (port && this.wss) {
+      this.wss.listen(port);
+    }
     if (!this.getSpeakerConfig().enabled) {
       console.log('Speaker is disabled in the configuration');
       return;
