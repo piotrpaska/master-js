@@ -1,38 +1,34 @@
-resultsDir: 'results/'
-
+resultsDir: results/
 ports:
   sensors: 4000
   speaker: 5000
   app_com: 3001
   countdown: 3002
-
 speaker:
   enabled: true
   id: '5'
-  name: 'Speaker start'
-
+  name: Speaker start
 tracks:
   - id: '1'
-    name: 'Track 1'
+    name: Track 1
     color: '#FF0000'
   - id: '2'
-    name: 'Track 2'
+    name: Track 2
     color: '#00FF00'
-
 sensors:
   - id: '1'
-    name: 'Sensor 1'
-    type: 'start'
+    name: Sensor 1
+    type: start
     trackId: '1'
   - id: '2'
-    name: 'Sensor 2'
-    type: 'finish'
+    name: Sensor 2
+    type: finish
     trackId: '1'
   - id: '3'
-    name: 'Sensor 3'
-    type: 'start'
+    name: Sensor 3
+    type: start
     trackId: '2'
   - id: '4'
-    name: 'Sensor 4'
-    type: 'finish'
+    name: Sensor 4
+    type: finish
     trackId: '2'

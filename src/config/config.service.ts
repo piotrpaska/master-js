@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { load } from 'js-yaml';
 import { z } from 'zod';
+import * as yaml from 'js-yaml';
 
 const configSchema = z
   .object({
@@ -108,5 +109,12 @@ export class ConfigService {
         ]
       : [];
     return [...sensors, ...speaker];
+  }
+
+  async updateConfig(newConfig: Config) {
+    const yamlString = yaml.dump(newConfig);
+
+    await fs.promises.writeFile('./config.yaml', yamlString, 'utf8');
+    this.refreshConfig();
   }
 }
