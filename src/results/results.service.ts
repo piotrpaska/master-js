@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { RecordService } from 'src/record/record.service';
 import GenerateResultsToCsvDto from './dto/generate-results-to-csv.dto';
 import { RecordStatus, StartList } from 'generated/prisma';
 import { ConfigService } from 'src/config/config.service';
 import { join } from 'node:path';
 import * as fs from 'fs';
-import { writeFileSync } from 'node:fs';
+import { createReadStream, writeFileSync } from 'node:fs';
 import { Record } from 'generated/prisma/runtime/library';
 
 const headers = [
@@ -46,6 +46,23 @@ export class ResultsService {
     private readonly configService: ConfigService,
     private readonly recordService: RecordService,
   ) {}
+
+  getListOfResults(): string[] {
+    const files = fs.readdirSync(this.configService.getConfig().resultsDir);
+    return files;
+  }
+
+  provideResultToDownload(name: string) {
+    const filePath = join(this.configService.getConfig().resultsDir, name);
+    if (!fs.existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+    const file = createReadStream(filePath);
+    return new StreamableFile(file, {
+      type: 'text/csv',
+      disposition: `attachment; filename="${name}"`,
+    });
+  }
 
   async exportResultsToCSV(
     props: GenerateResultsToCsvDto,
@@ -209,5 +226,19 @@ export class ResultsService {
       fileName: nameFile,
       filePath,
     };
+  }
+
+  deleteResult(name: string) {
+    const dir = this.configService.getConfig().resultsDir || './results';
+    const filePath = join(dir, name);
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`Deleted result file: ${filePath}`);
+      return { success: true };
+    } else {
+      console.log(`Result file not found: ${filePath}`);
+      return { success: false };
+    }
   }
 }
