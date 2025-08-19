@@ -8,12 +8,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { ConfigService } from 'src/config/config.service';
 import { DeviceService } from 'src/device/device.service';
 import { StartListService } from 'src/start-list/start-list.service';
 import { TrackService } from 'src/track/track.service';
 
-@WebSocketGateway({
+@WebSocketGateway(3001, {
   transports: ['websocket'],
   cors: {
     origin: '*',
@@ -21,7 +20,6 @@ import { TrackService } from 'src/track/track.service';
 })
 export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    private readonly configService: ConfigService,
     @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
     @Inject(forwardRef(() => DeviceService))
@@ -38,15 +36,8 @@ export class AppComGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleDisconnect() {
     console.log('[AppComGateway] Client disconnected');
   }
-  @WebSocketServer() server: Server;
 
-  // Add OnModuleInit to set the port dynamically
-  onModuleInit() {
-    const port = this.configService.getConfig().ports.app_com;
-    if (this.server && typeof port === 'number') {
-      this.server.listen(port);
-    }
-  }
+  @WebSocketServer() server: Server;
 
   @SubscribeMessage('all')
   async handleMessage(): Promise<string> {

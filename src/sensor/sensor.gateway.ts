@@ -1,4 +1,3 @@
-import { OnModuleInit } from '@nestjs/common';
 import { ConfigService } from 'src/config/config.service';
 import { TrackService } from 'src/track/track.service';
 import { Server, Socket } from 'socket.io';
@@ -11,6 +10,7 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 
 const sensorDataSchema = z.object({
@@ -18,84 +18,39 @@ const sensorDataSchema = z.object({
   timestamp: z.number(),
 });
 
-@WebSocketGateway({
+@WebSocketGateway(4000, {
   cors: {
     origin: '*',
   },
 })
-export class SensorGateway
-  implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class SensorGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly trackService: TrackService,
     private readonly configService: ConfigService,
     private readonly deviceService: DeviceService,
   ) {}
 
-  private wss: Server;
-
-  onModuleInit() {
-    const port = this.configService.getConfig().ports.sensors;
-    if (this.wss && typeof port === 'number') {
-      this.wss.listen(port);
-    }
-
-    /*this.wss.on('connection', (ws, req) => {
-      console.log('New sensor connected');
-
-      const clientId = req.url?.split('/').pop() || null;
-
-      if (!clientId) {
-        console.error('Client ID not provided in the request URL');
-        ws.close();
-        return;
-      }
-
-      void this.deviceService.setLiveConnection(clientId, true);
-
-      ws.on('message', (message: string) => {
-        console.log(`Received message from sensor: ${message}`);
-
-        const sensorData = JSON.parse(message) as unknown;
-
-        const validation = sensorDataSchema.safeParse(sensorData);
-        if (!validation.success) {
-          console.error('Invalid sensor data:', validation.error);
-          return;
-        }
-
-        // Process the validated sensor data
-        this.handleSensorData(validation.data).catch((err) => {
-          console.error('Error handling sensor data:', err);
-          ws.send(
-            JSON.stringify({
-              status: 'error',
-              message: 'Failed to process sensor data',
-            }),
-          );
-        });
-
-        ws.send(
-          JSON.stringify({ status: 'success', message: 'Data received' }),
-        );
-      });
-
-      ws.on('close', () => {
-        console.log('Sensor disconnected');
-        this.deviceService.setLiveConnection(clientId, false).catch((err) => {
-          console.error('Error setting live connection to false:', err);
-        });
-      });
-    });*/
-  }
+  @WebSocketServer() server: Server;
 
   handleConnection(@ConnectedSocket() client: Socket) {
     const auth = client.handshake.auth as { id?: string } | undefined;
     const clientId = auth?.id || null;
 
     if (!clientId) {
-      console.error('Client ID not provided in the request URL');
+      console.error('Client ID not provided');
       client.disconnect();
+      return;
+    }
+
+    if (!this.deviceService.getDeviceById(clientId)) {
+      client.disconnect();
+      console.error(`Client ID ${clientId} not found`);
+      return;
+    }
+
+    if (this.deviceService.getDeviceById(clientId)?.liveConnected) {
+      client.disconnect();
+      console.error(`Client ID ${clientId} is already connected`);
       return;
     }
 

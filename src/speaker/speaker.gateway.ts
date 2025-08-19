@@ -1,6 +1,8 @@
 import { forwardRef, Inject, OnModuleInit, Request } from '@nestjs/common';
 import {
+  ConnectedSocket,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -8,15 +10,18 @@ import { ConfigService } from 'src/config/config.service';
 import { Server, Socket } from 'socket.io';
 import { DeviceService } from 'src/device/device.service';
 
-@WebSocketGateway({
+@WebSocketGateway(5000, {
   cors: {
     origin: '*',
   },
 })
-export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
+export class SpeakerGateway
+  implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(
     @Inject(forwardRef(() => ConfigService))
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => DeviceService))
     private readonly deviceService: DeviceService,
   ) {}
 
@@ -24,20 +29,19 @@ export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
   private wss: Server;
 
   onModuleInit() {
-    const port = this.configService.getConfig().ports.speaker;
-    if (port && this.wss) {
-      this.wss.listen(port);
-    }
     if (!this.getSpeakerConfig().enabled) {
       console.log('Speaker is disabled in the configuration');
       return;
     }
   }
 
-  handleConnection(client: Socket) {
+  handleConnection(@ConnectedSocket() client: Socket) {
     console.log(`Client connected: ${client.id}`);
 
-    /*if (!clientId) {
+    const auth = client.handshake.auth as { id?: string } | undefined;
+    const clientId = auth?.id;
+
+    if (!clientId) {
       console.error('Client ID not provided in the request URL');
       client.disconnect();
       return;
@@ -49,7 +53,22 @@ export class SpeakerGateway implements OnModuleInit, OnGatewayConnection {
       );
       client.disconnect();
       return;
-    }*/
+    }
+
+    void this.deviceService.setLiveConnection(clientId, true);
+  }
+
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log(`Client disconnected: ${client.id}`);
+    const auth = client.handshake.auth as { id?: string } | undefined;
+    const clientId = auth?.id;
+
+    if (!clientId) {
+      console.error('Client ID not provided in the request URL');
+      return;
+    }
+
+    void this.deviceService.setLiveConnection(clientId, false);
   }
 
   private getSpeakerConfig() {

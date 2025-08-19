@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SpeakerGateway } from './speaker.gateway';
 import { ConfigModule } from 'src/config/config.module';
 import { DeviceModule } from 'src/device/device.module';
 
 @Module({
-  imports: [ConfigModule, DeviceModule],
+  imports: [forwardRef(() => ConfigModule), forwardRef(() => DeviceModule)],
   providers: [SpeakerGateway],
   exports: [SpeakerGateway],
 })
