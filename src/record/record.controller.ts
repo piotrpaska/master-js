@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -76,7 +77,7 @@ export class RecordController {
     }
   }
 
-  @Post('delete/:id')
+  @Delete(':id')
   async deleteRecord(@Param('id') id: string) {
     try {
       return this.recordService.deleteRecord({ id });
