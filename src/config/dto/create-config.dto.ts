@@ -1,11 +1,5 @@
 export class CreateConfigDto {
   resultsDir: string;
-  ports: {
-    sensors: number;
-    speaker: number;
-    app_com: number;
-    countdown: number;
-  };
   speaker: {
     enabled: boolean;
     id: string;

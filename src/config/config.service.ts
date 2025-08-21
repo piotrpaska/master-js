@@ -9,12 +9,6 @@ import { DeviceService } from 'src/device/device.service';
 const configSchema = z
   .object({
     resultsDir: z.string(),
-    ports: z.object({
-      sensors: z.number().int().positive(),
-      speaker: z.number().int().positive(),
-      app_com: z.number().int().positive(),
-      countdown: z.number().int().positive(),
-    }),
     speaker: z.object({
       enabled: z.boolean(),
       id: z.string(),

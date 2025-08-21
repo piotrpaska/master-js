@@ -22,13 +22,11 @@ export class SensorGateway implements OnModuleInit {
 
   onModuleInit() {
     this.wss = new Server({
-      port: this.configService.getConfig().ports.sensors,
+      port: 4000,
     });
 
     this.wss.on('listening', () => {
-      console.log(
-        `Sensor WebSocket server is listening on port ${this.configService.getConfig().ports.sensors}`,
-      );
+      console.log('Sensor WebSocket server is listening on port 4000');
     });
 
     this.wss.on('connection', (ws, req) => {

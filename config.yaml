@@ -1,9 +1,4 @@
 resultsDir: results/
-ports:
-  sensors: 4000
-  speaker: 5000
-  app_com: 3001
-  countdown: 3002
 speaker:
   enabled: true
   id: '5'
