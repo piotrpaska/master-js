@@ -16,4 +16,7 @@ export class CreateConfigDto {
     type: 'start' | 'finish';
     trackId: string;
   }[];
+  options: {
+    blockEntryAfterRun: boolean;
+  };
 }

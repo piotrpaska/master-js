@@ -256,7 +256,12 @@ export class TrackService implements OnModuleInit {
 
       await this.entryService.updateEntry(
         { id: entryId },
-        { alreadyStarted: true },
+        {
+          alreadyStarted: this.configService.getConfig().options
+            .blockEntryAfterRun
+            ? true
+            : false,
+        },
       );
 
       const record = await this.recordService.createRecord({
@@ -310,7 +315,12 @@ export class TrackService implements OnModuleInit {
 
       await this.entryService.updateEntry(
         { id: entryId },
-        { alreadyStarted: true },
+        {
+          alreadyStarted: this.configService.getConfig().options
+            .blockEntryAfterRun
+            ? true
+            : false,
+        },
       );
 
       const record = await this.recordService.createRecord({

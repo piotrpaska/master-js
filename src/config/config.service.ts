@@ -29,6 +29,9 @@ const configSchema = z
         trackId: z.string(),
       }),
     ),
+    options: z.object({
+      blockEntryAfterRun: z.boolean(),
+    }),
   })
   .strict();
 

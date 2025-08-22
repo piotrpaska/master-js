@@ -27,3 +27,5 @@ sensors:
     name: Sensor 4
     type: finish
     trackId: '2'
+options:
+  blockEntryAfterRun: false
