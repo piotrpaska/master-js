@@ -96,9 +96,13 @@ export class StartListService {
       }
     }
 
+    if (!startList) {
+      return null;
+    }
+
     return {
-      title: startList!.title,
-      entries: startList!.entries,
+      title: startList.title,
+      entries: startList.entries,
       session,
     };
   }

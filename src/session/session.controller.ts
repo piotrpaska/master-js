@@ -22,7 +22,20 @@ export class SessionController {
 
   @Get('/:id')
   async getSessionById(@Param('id') id: string) {
-    const session = await this.sessionService.session({ id });
+    const session = await this.sessionService.session(
+      { id },
+      {
+        records: {
+          include: {
+            entry: {
+              include: {
+                athlete: true,
+              },
+            },
+          },
+        },
+      },
+    );
     if (!session) {
       throw new NotFoundException(`Session with id ${id} not found`);
     }
