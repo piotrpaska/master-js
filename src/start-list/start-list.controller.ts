@@ -32,6 +32,19 @@ export class StartListController {
         entries: {
           include: { athlete: true },
         },
+        sessions: {
+          include: {
+            records: {
+              include: {
+                entry: {
+                  include: {
+                    athlete: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     );
     if (!startList) {

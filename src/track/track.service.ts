@@ -220,7 +220,6 @@ export class TrackService implements OnModuleInit {
 
       track.startTime = startTime;
       track.running = true;
-      track.prevDuration = null;
       await this.appComModule.updateClientsData();
       return track;
     }
@@ -323,8 +322,8 @@ export class TrackService implements OnModuleInit {
       const startTime = track.startTime;
 
       track.running = false;
-      track.prevDuration = null;
       track.startTime = null;
+      track.prevDuration = null;
       track.entryId = null;
 
       const entry = await this.entryService.entry({ id: entryId });
