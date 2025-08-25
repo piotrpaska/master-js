@@ -11,6 +11,10 @@ import {
 import { StartListService } from './start-list.service';
 import { CreateStartListDto } from './dto/create-start-list.dto';
 
+class ActivateStartListDto {
+  sessionId?: string;
+}
+
 @Controller('start-list')
 export class StartListController {
   constructor(private startListService: StartListService) {}
@@ -27,9 +31,6 @@ export class StartListController {
       {
         entries: {
           include: { athlete: true },
-        },
-        records: {
-          include: { entry: { include: { athlete: true } } },
         },
       },
     );
@@ -61,12 +62,19 @@ export class StartListController {
   }
 
   @Put(':id/activate')
-  async setActiveStartList(@Param('id') id: string) {
+  async setActiveStartList(
+    @Param('id') id: string,
+    @Body() body: ActivateStartListDto,
+  ) {
     const startList = await this.startListService.startList({ id });
     if (!startList) {
       throw new NotFoundException(`Start list with id ${id} not found`);
     }
-    return await this.startListService.setActiveStartListId(id);
+    console.log('Activating start list', id, 'with sessionId', body?.sessionId);
+    return await this.startListService.setActiveStartListId(
+      id,
+      body?.sessionId,
+    );
   }
 
   @Put('active-reset')

@@ -25,7 +25,11 @@ export class RecordController {
             athlete: true,
           },
         },
-        startList: true,
+        session: {
+          include: {
+            startList: true,
+          },
+        },
       },
     });
   }
@@ -40,7 +44,11 @@ export class RecordController {
             athlete: true,
           },
         },
-        startList: true,
+        session: {
+          include: {
+            startList: true,
+          },
+        },
       },
     );
     if (!record) {
@@ -60,7 +68,7 @@ export class RecordController {
         endTime: data.endTime,
         status: data.status,
         entry: { connect: { id: data.entryId } },
-        startList: { connect: { id: data.startListId } },
+        session: { connect: { id: data.sessionId } },
       };
       return this.recordService.createRecord(recordCreateInput);
     } catch {

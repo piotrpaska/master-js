@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, StartList } from 'generated/prisma';
+import { Athlete, Entry, Prisma, Session, StartList } from 'generated/prisma';
 import { AppComGateway } from 'src/app_com/app_com.gateway';
 
 // Extend the BigInt interface to include toJSON
@@ -23,20 +23,24 @@ export class StartListService {
   ) {}
 
   private activeStartListId: string | null = null;
+  private activeSessionId: string | null = null;
 
-  async setActiveStartListId(id: string): Promise<string> {
+  async setActiveStartListId(id: string, sessionId?: string): Promise<string> {
     const startList = await this.startList({ id });
     if (!startList) {
       throw new Error(`Start list with id ${id} not found`);
     }
 
     this.activeStartListId = id;
+    this.activeSessionId = sessionId || null;
     await this.appComGateway.updateClientsData();
+    console.log(await this.getActiveStartList());
     return this.activeStartListId;
   }
 
   async resetActiveStartList(): Promise<void> {
     this.activeStartListId = null;
+    this.activeSessionId = null;
     await this.appComGateway.updateClientsData();
   }
 
@@ -44,11 +48,21 @@ export class StartListService {
     return this.activeStartListId;
   }
 
-  async getActiveStartList(): Promise<StartList | null> {
+  getActiveSessionId(): string | null {
+    return this.activeSessionId;
+  }
+
+  async getActiveStartList(): Promise<{
+    title: string;
+    entries: (Omit<Entry, 'startListId'> & {
+      athlete: Athlete | null;
+    })[];
+    session: Session | null;
+  } | null> {
     if (!this.activeStartListId) {
       return null;
     }
-    return this.prisma.startList.findUnique({
+    const startList = await this.prisma.startList.findUnique({
       where: { id: this.activeStartListId },
       include: {
         entries: {
@@ -56,17 +70,37 @@ export class StartListService {
             athlete: true,
           },
         },
-        records: {
+      },
+    });
+
+    let session: Session | null = null;
+    if (this.activeSessionId) {
+      try {
+        session = await this.prisma.session.findUnique({
+          where: { id: this.activeSessionId },
           include: {
-            entry: {
+            records: {
               include: {
-                athlete: true,
+                entry: {
+                  include: {
+                    athlete: true,
+                  },
+                },
               },
             },
           },
-        },
-      },
-    });
+        });
+      } catch (error) {
+        console.error('Failed to fetch session:', error);
+        session = null;
+      }
+    }
+
+    return {
+      title: startList!.title,
+      entries: startList!.entries,
+      session,
+    };
   }
 
   async startList(

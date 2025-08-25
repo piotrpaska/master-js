@@ -1,7 +1,7 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { RecordService } from 'src/record/record.service';
 import GenerateResultsToCsvDto from './dto/generate-results-to-csv.dto';
-import { RecordStatus, StartList } from 'generated/prisma';
+import { RecordStatus, Session } from 'generated/prisma';
 import { ConfigService } from 'src/config/config.service';
 import { join } from 'node:path';
 import * as fs from 'fs';
@@ -36,8 +36,8 @@ interface CsvRecord {
   recordId: string;
   entryId: string;
   athleteId: string;
-  startListId: string;
-  startListTitle: string;
+  sessionId: string;
+  sessionTitle: string;
 }
 
 @Injectable()
@@ -69,8 +69,8 @@ export class ResultsService {
   ): Promise<{ fileName: string; filePath: string }> {
     const { startListId, mode, fileName } = props;
 
-    const recordsOfStartList = (await this.recordService.records({
-      where: { startListId: startListId },
+    const recordsOfSession = (await this.recordService.records({
+      where: { sessionId: startListId },
       orderBy: { duration: 'asc' },
       include: {
         entry: {
@@ -78,31 +78,31 @@ export class ResultsService {
             athlete: true,
           },
         },
-        startList: true,
+        session: true,
       },
     })) as Array<{
-      startListId: string;
+      status: RecordStatus;
       id: string;
+      sessionId: string;
+      duration: bigint | null;
+      timestamp: Date;
       startTime: bigint;
       endTime: bigint | null;
-      duration: bigint | null;
       track: string;
       entryId: string;
-      status: RecordStatus;
-      timestamp: Date;
       entry: {
         athlete: {
           id: string;
           name: string;
         };
       };
-      startList: StartList;
+      session: Session;
     }>;
 
     switch (mode) {
       case 'best': {
         const bestRecords = Object.values(
-          recordsOfStartList.reduce(
+          recordsOfSession.reduce(
             (acc, record) => {
               const entryId = record.entryId;
               if (
@@ -116,7 +116,7 @@ export class ResultsService {
               }
               return acc;
             },
-            {} as Record<string, (typeof recordsOfStartList)[0]>,
+            {} as Record<string, (typeof recordsOfSession)[0]>,
           ),
         ).sort((a, b) => {
           if (a.duration === null && b.duration === null) return 0;
@@ -138,16 +138,16 @@ export class ResultsService {
             recordId: record.id,
             entryId: record.entryId,
             athleteId: record.entry.athlete.id,
-            startListId: record.startListId,
-            startListTitle: record.startList.title,
+            sessionId: record.sessionId,
+            sessionTitle: record.session?.title,
           })),
-          recordsOfStartList[0]?.startList || ({} as StartList),
+          recordsOfSession[0]?.session || ({} as Session),
           fileName,
         );
       }
       case 'all': {
         return this.generateCsvContent(
-          recordsOfStartList.map((record, index) => ({
+          recordsOfSession.map((record, index) => ({
             rank: index + 1,
             athlete: record.entry.athlete.name,
             time: record.duration ? String(record.duration) : 'N/A',
@@ -159,10 +159,10 @@ export class ResultsService {
             recordId: record.id,
             entryId: record.entryId,
             athleteId: record.entry.athlete.id,
-            startListId: record.startListId,
-            startListTitle: record.startList.title,
+            sessionId: record.sessionId,
+            sessionTitle: record.session?.title,
           })),
-          recordsOfStartList[0]?.startList || ({} as StartList),
+          recordsOfSession[0]?.session || ({} as Session),
           fileName,
         );
       }
@@ -174,7 +174,7 @@ export class ResultsService {
 
   generateCsvContent(
     data: CsvRecord[],
-    startList: StartList,
+    session: Session,
     fileName?: string,
   ): { fileName: string; filePath: string } {
     let csvContent = headers.join(',') + '\r\n';
@@ -194,8 +194,8 @@ export class ResultsService {
         record.recordId,
         record.entryId,
         record.athleteId,
-        record.startListId,
-        record.startListTitle,
+        record.sessionId,
+        record.sessionTitle,
       ].join(',');
       csvContent += row + '\r\n';
     });
@@ -210,7 +210,7 @@ export class ResultsService {
     if (!fileName) {
       // Replace colons and other invalid filename characters
       const safeDate = new Date().toISOString().replace(/[:]/g, '-');
-      fileName = `results-${startList.title}-${safeDate}.csv`;
+      fileName = `results-${session.title}-${safeDate}.csv`;
     }
 
     const nameFile = fileName.endsWith('.csv') ? fileName : `${fileName}.csv`;

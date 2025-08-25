@@ -21,15 +21,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/*model Track {
-  id String @id @default(cuid())
-  startTime BigInt @default(0)
-  prevDuration BigInt @default(0)
-  running Boolean @default(false)
-  assignedEntryId String?
-  entry Entry? @relation(fields: [assignedEntryId], references: [id])
-}*/
-
 model Record {
   id String @id @default(cuid())
   startTime BigInt @default(0)
@@ -37,29 +28,14 @@ model Record {
   duration BigInt?
   track String
   entryId String
-  startListId String
+  sessionId String
   status RecordStatus @default(OK)
   timestamp DateTime @default(now())
-  
-  startList StartList @relation(fields: [startListId], references: [id], onDelete: Cascade)
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 }
-
-/*model Device {
-  id String @id @default(cuid())
-  deviceId String @unique
-  name String
-  type String
-  lastSeen DateTime @default(now())
-}
-
-model LiveAgents {
-  id String @id @default(cuid())
-  deviceId String @unique
-  deviceName String
-  live Boolean @default(false)
-}*/
 
 model StartList {
   id String @id @default(cuid())
@@ -67,7 +43,7 @@ model StartList {
 
   entries Entry[]
 
-  records Record[]
+  sessions Session[]
 }
 
 model Entry {
@@ -79,7 +55,14 @@ model Entry {
   bib String
   alreadyStarted Boolean @default(false)
 
-  //Tracks Track[]
+  records Record[]
+}
+
+model Session {
+  id String @id @default(cuid())
+  title String
+  startListId String
+  startList StartList @relation(fields: [startListId], references: [id], onDelete: Cascade)
 
   records Record[]
 }

@@ -15,6 +15,7 @@ import { AppComModule } from './app_com/app_com.module';
 import { StartSequenceModule } from './start_sequence/start_sequence.module';
 import { CountdownModule } from './countdown/countdown.module';
 import { ResultsModule } from './results/results.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ResultsModule } from './results/results.module';
     StartSequenceModule,
     CountdownModule,
     ResultsModule,
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

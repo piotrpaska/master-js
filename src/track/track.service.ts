@@ -13,6 +13,7 @@ import { RecordService } from 'src/record/record.service';
 import { ConfigService } from 'src/config/config.service';
 import { AppComGateway } from 'src/app_com/app_com.gateway';
 import { SpeakerGateway } from 'src/speaker/speaker.gateway';
+import { StartListService } from 'src/start-list/start-list.service';
 
 @Injectable()
 export class TrackService implements OnModuleInit {
@@ -25,6 +26,7 @@ export class TrackService implements OnModuleInit {
     @Inject(forwardRef(() => AppComGateway))
     private appComModule: AppComGateway,
     private readonly speakerService: SpeakerGateway,
+    private readonly startListService: StartListService,
   ) {}
 
   onModuleInit() {
@@ -210,6 +212,12 @@ export class TrackService implements OnModuleInit {
         throw new Error(`Track with ID ${id} has no entry assigned`);
       }
 
+      const sessionId = this.startListService.getActiveSessionId();
+
+      if (!sessionId) {
+        throw new Error(`No active session found for track with ID ${id}`);
+      }
+
       track.startTime = startTime;
       track.running = true;
       track.prevDuration = null;
@@ -235,6 +243,12 @@ export class TrackService implements OnModuleInit {
 
       if (track.startTime === null || track.startTime === 0) {
         throw new Error(`Track with ID ${id} has not been started`);
+      }
+
+      const sessionId = this.startListService.getActiveSessionId();
+
+      if (!sessionId) {
+        throw new Error(`No active session found for track with ID ${id}`);
       }
 
       this.speakerService.signalizeTrackStop();
@@ -271,7 +285,7 @@ export class TrackService implements OnModuleInit {
         endTime: endTime,
         status: 'OK',
         entry: { connect: { id: entryId } },
-        startList: { connect: { id: entry.startListId } },
+        session: { connect: { id: sessionId } },
       });
 
       track.relatedLastRecordId = record.id;
@@ -297,6 +311,12 @@ export class TrackService implements OnModuleInit {
 
       if (track.startTime === null || track.startTime === 0) {
         throw new Error(`Track with ID ${id} has not been started`);
+      }
+
+      const sessionId = this.startListService.getActiveSessionId();
+
+      if (!sessionId) {
+        throw new Error(`No active session found for track with ID ${id}`);
       }
 
       const entryId = track.entryId;
@@ -330,7 +350,9 @@ export class TrackService implements OnModuleInit {
         endTime: null,
         status: status,
         entry: { connect: { id: entryId } },
-        startList: { connect: { id: entry.startListId } },
+        session: {
+          connect: { id: sessionId },
+        },
       });
 
       track.relatedLastRecordId = record.id;

@@ -7,6 +7,7 @@ import { RecordModule } from 'src/record/record.module';
 import { ConfigModule } from 'src/config/config.module';
 import { SpeakerModule } from 'src/speaker/speaker.module';
 import { AppComModule } from 'src/app_com/app_com.module';
+import { StartListModule } from 'src/start-list/start-list.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AppComModule } from 'src/app_com/app_com.module';
     forwardRef(() => ConfigModule),
     SpeakerModule,
     forwardRef(() => AppComModule),
+    StartListModule,
   ],
   controllers: [TrackController],
   providers: [TrackService],
