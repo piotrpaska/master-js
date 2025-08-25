@@ -285,6 +285,7 @@ export class TrackService implements OnModuleInit {
         status: 'OK',
         entry: { connect: { id: entryId } },
         session: { connect: { id: sessionId } },
+        trackId: track.id,
       });
 
       track.relatedLastRecordId = record.id;
@@ -352,6 +353,7 @@ export class TrackService implements OnModuleInit {
         session: {
           connect: { id: sessionId },
         },
+        trackId: track.id,
       });
 
       track.relatedLastRecordId = record.id;

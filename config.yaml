@@ -10,6 +10,9 @@ tracks:
   - id: '2'
     name: Track 2
     color: '#00FF00'
+  - id: '3'
+    name: Track 3
+    color: '#c50202'
 sensors:
   - id: '1'
     name: Sensor 1

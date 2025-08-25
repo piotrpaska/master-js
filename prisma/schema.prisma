@@ -28,6 +28,7 @@ model Record {
   duration BigInt?
   track String
   entryId String
+  trackId String
   sessionId String
   status RecordStatus @default(OK)
   timestamp DateTime @default(now())

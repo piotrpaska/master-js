@@ -67,6 +67,7 @@ export class RecordController {
         startTime: data.startTime,
         endTime: data.endTime,
         status: data.status,
+        trackId: data.trackId,
         entry: { connect: { id: data.entryId } },
         session: { connect: { id: data.sessionId } },
       };

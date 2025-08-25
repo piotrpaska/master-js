@@ -85,6 +85,7 @@ export class ResultsService {
       id: string;
       sessionId: string;
       duration: bigint | null;
+      trackId: string;
       timestamp: Date;
       startTime: bigint;
       endTime: bigint | null;

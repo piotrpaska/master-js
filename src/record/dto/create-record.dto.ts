@@ -6,5 +6,6 @@ export class CreateRecordDto {
   track: string;
   entryId: string;
   timestamp: Date;
+  trackId: string;
   status: 'OK' | 'DNS' | 'DNF' | 'DSQ';
 }
