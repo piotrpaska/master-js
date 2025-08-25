@@ -90,6 +90,15 @@ export class SensorGateway implements OnModuleInit {
           console.error('Error setting live connection to false:', err);
         });
       });
+      ws.on('error', (err) => {
+        console.error(`WebSocket error for client ${clientId}:`, err);
+        this.deviceService.setLiveConnection(clientId, false).catch((error) => {
+          console.error(
+            'Error setting live connection to false after error:',
+            error,
+          );
+        });
+      });
     });
   }
 
