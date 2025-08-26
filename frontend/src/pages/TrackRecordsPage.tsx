@@ -39,6 +39,14 @@ export default function TrackRecordsPage(): React.JSX.Element {
         }
       });
 
+      for (const trackId in tracks) {
+        tracks[trackId].sort((a, b) => {
+          const timeA = Number(a.duration ?? 0);
+          const timeB = Number(b.duration ?? 0);
+          return timeA - timeB;
+        });
+      }
+
       return tracks;
     }
 

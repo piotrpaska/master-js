@@ -21,6 +21,16 @@ export function App({
 }: {
   children: React.ReactNode;
 }): React.JSX.Element {
+  console.log('VITE_MASTER_API_URL:', import.meta.env.VITE_MASTER_API_URL);
+  console.log(
+    'VITE_MASTER_COUNTDOWN_SOCKET_URL:',
+    import.meta.env.VITE_MASTER_COUNTDOWN_SOCKET_URL
+  );
+  console.log(
+    'VITE_MASTER_API_SOCKET_URL:',
+    import.meta.env.VITE_MASTER_API_SOCKET_URL
+  );
+
   return (
     <SidebarProvider>
       {/*<div className="flex justify-between items-center">

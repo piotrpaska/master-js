@@ -11,11 +11,12 @@ services:
       - '4000:4000'
       - '5000:5000'
     environment:
-      - DATABASE_URL=mysql://root:root@db:3306/dst
+      - DATABASE_URL=mysql://root:root@192.168.50.51:3306/dst
     volumes:
       - /home/dynamic/dst/master/config:/app/config
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app_network
     restart: always
@@ -24,12 +25,12 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_MASTER_COUNTDOWN_SOCKET_URL=http://192.168.50.51:3002
+        - VITE_MASTER_API_SOCKET_URL=http://192.168.50.51:3001
+        - VITE_MASTER_API_URL=http://192.168.50.51:3000
     ports:
       - '8080:8080'
-    environment:
-      - VITE_MASTER_COUNTDOWN_SOCKET_URL=http://backend:3002
-      - VITE_MASTER_API_SOCKET_URL=http://backend:3001
-      - VITE_MASTER_API_URL=http://backend:3000
     depends_on:
       - backend
     networks:
@@ -43,12 +44,16 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: dst
-      MYSQL_PASSWORD: root
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - app_network
     restart: always
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
 volumes:
   db_data:
