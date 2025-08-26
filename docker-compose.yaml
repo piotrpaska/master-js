@@ -11,7 +11,7 @@ services:
       - '4000:4000'
       - '5000:5000'
     environment:
-      - DATABASE_URL="postgresql://postgres:postgres@db:5432/dst?schema=public"
+      - DATABASE_URL=postgresql://postgres:postgres@192.168.50.51:5432/dst?schema=public
     volumes:
       - /home/dynamic/dst/master/config:/app/config
     depends_on:
@@ -23,6 +23,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - '5173:5173'
+    environment:
+      - VITE_MASTER_COUNTDOWN_SOCKET_URL=http://192.168.50.51:3002
+      - VITE_MASTER_API_SOCKET_URL=http://192.168.50.51:3001
+      - VITE_MASTER_API_URL=http://192.168.50.51:3000
     depends_on:
       - backend
 

@@ -10,6 +10,8 @@ RUN npm install -g serve
 
 COPY . .
 
-EXPOSE 5173
+RUN npm run build
 
-CMD ["serve", "-s", "dist", "-l", "5173"]
+EXPOSE 8080
+
+CMD ["serve", "-s", "dist", "-l", "8080"]
