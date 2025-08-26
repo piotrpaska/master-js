@@ -51,7 +51,20 @@ export class ConfigService {
 
   private loadConfig() {
     // Load and parse the config file
-    const configPath = './config.yaml'; // Adjust path as needed
+    const configPath = './config/config.yaml'; // Adjust path as needed
+
+    if (!fs.existsSync(configPath)) {
+      // If the config file doesn't exist, create it from the example
+      const exampleConfigPath = './config/config-example.yaml'; // Path to the example config file
+      try {
+        const exampleFileContents = fs.readFileSync(exampleConfigPath, 'utf8');
+        fs.writeFileSync(configPath, exampleFileContents, 'utf8');
+        console.log('Config file created from example.');
+      } catch (e) {
+        console.error('Error creating config file from example:', e);
+        process.exit(1); // Exit if the example config cannot be loaded
+      }
+    }
 
     try {
       const fileContents = fs.readFileSync(configPath, 'utf8');
