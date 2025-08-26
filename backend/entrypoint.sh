@@ -1,4 +1,3 @@
-// filepath: e:\It-Projects\DynamicTiming\master-js\backend\entrypoint.sh
 #!/bin/sh
 
 # Wait for the database to be ready
