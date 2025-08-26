@@ -55,7 +55,7 @@ export class ConfigService {
 
     if (!fs.existsSync(configPath)) {
       // If the config file doesn't exist, create it from the example
-      const exampleConfigPath = './config/config-example.yaml'; // Path to the example config file
+      const exampleConfigPath = './config-example.yaml'; // Path to the example config file
       try {
         const exampleFileContents = fs.readFileSync(exampleConfigPath, 'utf8');
         fs.writeFileSync(configPath, exampleFileContents, 'utf8');
