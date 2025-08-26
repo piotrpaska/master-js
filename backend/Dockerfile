@@ -1,4 +1,4 @@
-FROM node:22
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -11,8 +11,6 @@ COPY . .
 RUN npm install -g prisma
 
 RUN npx prisma generate
-
-#RUN prisma migrate deploy
 
 RUN npm run build
 
