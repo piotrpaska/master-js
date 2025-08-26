@@ -1,2 +1,0 @@
--- AddForeignKey
-ALTER TABLE `Record` ADD CONSTRAINT `Record_entryId_fkey` FOREIGN KEY (`entryId`) REFERENCES `Entry`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

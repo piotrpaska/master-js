@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `entry` ALTER COLUMN `bib` DROP DEFAULT;
