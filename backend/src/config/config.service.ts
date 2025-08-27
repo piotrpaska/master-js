@@ -37,6 +37,8 @@ const configSchema = z
 
 type Config = z.infer<typeof configSchema>;
 
+const configPath = './config/config.yaml'; // Adjust path as needed
+
 @Injectable()
 export class ConfigService {
   private config: Config;
@@ -51,7 +53,6 @@ export class ConfigService {
 
   private loadConfig() {
     // Load and parse the config file
-    const configPath = './config/config.yaml'; // Adjust path as needed
 
     if (!fs.existsSync(configPath)) {
       // If the config file doesn't exist, create it from the example
@@ -136,7 +137,7 @@ export class ConfigService {
   async updateConfig(newConfig: Config) {
     const yamlString = yaml.dump(newConfig);
 
-    await fs.promises.writeFile('./config.yaml', yamlString, 'utf8');
+    await fs.promises.writeFile(configPath, yamlString, 'utf8');
     this.refreshConfig();
     this.trackService?.reInitTracks();
     await this.deviceService?.reInitDevices();
