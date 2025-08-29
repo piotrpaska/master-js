@@ -1,4 +1,4 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
 import { RecordService } from 'src/record/record.service';
 import GenerateResultsToCsvDto from './dto/generate-results-to-csv.dto';
 import { RecordStatus, Session } from 'generated/prisma';
@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import * as fs from 'fs';
 import { createReadStream, writeFileSync } from 'node:fs';
 import { Record } from 'generated/prisma/runtime/library';
+import { SessionService } from 'src/session/session.service';
 
 const headers = [
   'Rank',
@@ -45,6 +46,7 @@ export class ResultsService {
   constructor(
     private readonly configService: ConfigService,
     private readonly recordService: RecordService,
+    private readonly sessionService: SessionService,
   ) {}
 
   getListOfResults(): string[] {
@@ -67,10 +69,12 @@ export class ResultsService {
   async exportResultsToCSV(
     props: GenerateResultsToCsvDto,
   ): Promise<{ fileName: string; filePath: string }> {
-    const { startListId, mode, fileName } = props;
+    const { sessionId, mode, fileName } = props;
+
+    const session = await this.sessionService.session({ id: sessionId });
 
     const recordsOfSession = (await this.recordService.records({
-      where: { sessionId: startListId },
+      where: { sessionId: sessionId },
       orderBy: { duration: 'asc' },
       include: {
         entry: {
@@ -99,6 +103,10 @@ export class ResultsService {
       };
       session: Session;
     }>;
+
+    if (!recordsOfSession.length) {
+      throw new HttpException('No records found for the session', 400);
+    }
 
     switch (mode) {
       case 'best': {
@@ -142,7 +150,7 @@ export class ResultsService {
             sessionId: record.sessionId,
             sessionTitle: record.session?.title,
           })),
-          recordsOfSession[0]?.session || ({} as Session),
+          session || ({} as Session),
           fileName,
         );
       }
@@ -163,7 +171,7 @@ export class ResultsService {
             sessionId: record.sessionId,
             sessionTitle: record.session?.title,
           })),
-          recordsOfSession[0]?.session || ({} as Session),
+          session || ({} as Session),
           fileName,
         );
       }

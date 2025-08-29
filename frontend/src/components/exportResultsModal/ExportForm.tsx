@@ -12,28 +12,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { useMasterSocket } from '@/hooks/MasterSocket';
 import StartList from '@/interfaces/startList';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
+import Session from '@/interfaces/session';
 
 const formSchema = z.object({
-  startListId: z.string().min(1, 'Start list ID is required'),
+  startListId: z.string().min(1, 'Start List ID is required'),
+  sessionId: z.string().min(1, 'Session ID is required'),
   mode: z.enum(['best', 'all']),
   fileName: z.string().nullable().optional(),
 });
 
 export default function ExportForm() {
-  const { data: masterData } = useMasterSocket();
-
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      startListId: masterData?.activeStartList?.id || '',
+      sessionId: '',
       mode: 'best',
       fileName: '',
     },
@@ -48,12 +47,23 @@ export default function ExportForm() {
     refetchOnWindowFocus: true,
   });
 
+  const { data: sessions } = useQuery({
+    queryKey: ['sessions', form.watch('startListId')],
+    queryFn: async () => {
+      const response = await axiosInstance.get<Session[]>('/session');
+      return response.data.filter(
+        (session) => session.startListId === form.watch('startListId')
+      );
+    },
+    enabled: !!form.watch('startListId'),
+  });
+
   const exportMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       const response = await axiosInstance.post(
         '/results/export-to-csv',
         {
-          startListId: data.startListId,
+          sessionId: data.sessionId,
           mode: data.mode,
           fileName: data.fileName || undefined, // Use undefined if fileName is empty
         },
@@ -109,7 +119,7 @@ export default function ExportForm() {
           control={form.control}
           name="startListId"
           render={({ field }) => (
-            <FormItem className="col-span-4 md:col-span-3">
+            <FormItem className="col-span-4 md:col-span-2">
               <FormLabel>Start List</FormLabel>
               <Select defaultValue={field.value} onValueChange={field.onChange}>
                 <SelectTrigger className="w-full">
@@ -129,6 +139,45 @@ export default function ExportForm() {
 
         <FormField
           control={form.control}
+          name="sessionId"
+          render={({ field }) => (
+            <FormItem className="col-span-4 md:col-span-2">
+              <FormLabel>Session</FormLabel>
+              <Select defaultValue={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Session" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sessions?.map((session) => (
+                    <SelectItem key={session.id} value={session.id}>
+                      {session.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="fileName"
+          render={({ field }) => (
+            <FormItem className="col-span-4 md:col-span-3">
+              <FormLabel>File Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter file name"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="mode"
           render={({ field }) => (
             <FormItem className="col-span-4 md:col-span-1">
@@ -142,23 +191,6 @@ export default function ExportForm() {
                   <SelectItem value="all">All</SelectItem>
                 </SelectContent>
               </Select>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="fileName"
-          render={({ field }) => (
-            <FormItem className="col-span-4">
-              <FormLabel>File Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter file name"
-                  {...field}
-                  value={field.value ?? ''}
-                />
-              </FormControl>
             </FormItem>
           )}
         />

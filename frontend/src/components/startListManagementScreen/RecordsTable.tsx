@@ -219,7 +219,7 @@ export default function RecordsTable({
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex flex-col md:flex-row justify-start md:justify-between gap-4">
         <div className="flex items-center gap-2">
           <Label htmlFor="session-select">Session:</Label>
           <Select
@@ -265,18 +265,13 @@ export default function RecordsTable({
           </Popover>
         </div>
 
-        <div className="flex items-end justify-center gap-2">
-          <div>
-            <Label htmlFor="search-input" className="mb-1">
-              Search:
-            </Label>
-            <Input
-              id="add-input"
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Enter session title..."
-            />
-          </div>
+        <div className="flex items-end gap-2">
+          <Input
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            placeholder="Enter session title..."
+            className="w-full md:w-md"
+          />
 
           <Button
             variant="outline"

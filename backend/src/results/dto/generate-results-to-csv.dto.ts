@@ -1,5 +1,5 @@
 export default class GenerateResultsToCsvDto {
-  startListId: string;
+  sessionId: string;
   mode: 'best' | 'all';
   fileName?: string;
 }
