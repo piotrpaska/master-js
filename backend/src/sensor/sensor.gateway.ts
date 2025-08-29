@@ -29,6 +29,11 @@ export class SensorGateway implements OnModuleInit {
       console.log('Sensor WebSocket server is listening on port 4000');
     });
 
+    this.wss.on('headers', (headers: string[]) => {
+      headers.push('Connection: Keep-Alive');
+      headers.push('Keep-Alive: timeout=0, max=1000');
+    });
+
     this.wss.on('connection', (ws, req) => {
       console.log('New sensor connected');
 
