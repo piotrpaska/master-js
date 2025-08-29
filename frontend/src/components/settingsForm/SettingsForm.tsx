@@ -32,6 +32,12 @@ import {
 } from '../ui/alert-dialog';
 import { Separator } from '../ui/separator';
 import OptionsField from './OptionsField';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 
 export default function SettingsForm() {
   type SettingsFormData = z.infer<typeof formSchema>;
@@ -53,6 +59,8 @@ export default function SettingsForm() {
     },
     onSuccess: () => {
       toast.success('Settings updated successfully');
+      refetch();
+      form.reset();
     },
     onError: () => {
       toast.error('Failed to update settings');
@@ -84,98 +92,127 @@ export default function SettingsForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} id="settings-form">
-        <div className="flex flex-col md:flex-row w-full gap-4">
-          <div className="flex flex-col gap-4 w-full md:w-1/4">
-            <FormField
-              control={form.control}
-              name="resultsDir"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Results Directory</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Results Directory"
-                      {...field}
-                      onFocus={(e) => {
-                        e.target.select();
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <div className="flex flex-col gap-4">
+          <FormField
+            control={form.control}
+            name="resultsDir"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel>Results Directory</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Results Directory"
+                    {...field}
+                    onFocus={(e) => {
+                      e.target.select();
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="col-span-1 row-span-3 border p-2 flex flex-col gap-4 items-center justify-stretch">
-              <FormField
-                control={form.control}
-                name="speaker.enabled"
-                render={({ field }) => (
-                  <FormItem className="flex items-center">
-                    <FormLabel>Speaker Enabled</FormLabel>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex items-center justify-between w-full text-xl font-semibold"
+              >
+                Speaker Settings
+                <ChevronDown />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="border-b p-4">
+              <div className="space-y-4 mt-4">
+                <FormField
+                  control={form.control}
+                  name="speaker.enabled"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center">
+                      <FormLabel>Speaker Enabled</FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="speaker.id"
-                render={({ field }) => (
-                  <FormItem className="">
-                    <FormLabel>Speaker ID</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Speaker ID"
-                        {...field}
-                        disabled={!form.watch('speaker.enabled')}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="speaker.id"
+                  render={({ field }) => (
+                    <FormItem className="">
+                      <FormLabel>Speaker ID</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Speaker ID"
+                          {...field}
+                          disabled={!form.watch('speaker.enabled')}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="speaker.name"
-                render={({ field }) => (
-                  <FormItem className="">
-                    <FormLabel>Speaker Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Speaker Name"
-                        {...field}
-                        disabled={!form.watch('speaker.enabled')}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="speaker.name"
+                  render={({ field }) => (
+                    <FormItem className="">
+                      <FormLabel>Speaker Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Speaker Name"
+                          {...field}
+                          disabled={!form.watch('speaker.enabled')}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
-            <OptionsField form={form} />
-          </div>
-
-          <div className="flex flex-col md:flex-row w-full md:w-3/4 gap-4">
-            <div className="col-span-3 row-span-full border p-4 md:w-1/2">
-              <h2 className="text-lg font-semibold">Tracks</h2>
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex items-center justify-between w-full text-xl font-semibold"
+              >
+                Tracks
+                <ChevronDown />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="border-b p-4">
               <TracksField form={form} />
-            </div>
-
-            <div className="col-span-3 row-span-full border p-4 md:w-1/2">
-              <h2 className="text-lg font-semibold">Sensors</h2>
+            </CollapsibleContent>
+          </Collapsible>
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex items-center justify-between w-full text-xl font-semibold"
+              >
+                Sensors
+                <ChevronDown />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="border-b p-4">
               <SensorsField form={form} />
-            </div>
-          </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <OptionsField form={form} />
         </div>
+
         <div className="flex justify-end mt-4 gap-2">
           <AlertDialog>
             <AlertDialogTrigger asChild disabled={!form.formState.isDirty}>
