@@ -31,6 +31,7 @@ const configSchema = z
     ),
     options: z.object({
       blockEntryAfterRun: z.boolean(),
+      countdown: z.number().min(0),
     }),
   })
   .strict();

@@ -24,5 +24,6 @@ export const formSchema = z.object({
   ),
   options: z.object({
     blockEntryAfterRun: z.boolean(),
+    countdown: z.number().min(0),
   }),
 });

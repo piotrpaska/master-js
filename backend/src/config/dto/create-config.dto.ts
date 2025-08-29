@@ -18,5 +18,6 @@ export class CreateConfigDto {
   }[];
   options: {
     blockEntryAfterRun: boolean;
+    countdown: number;
   };
 }

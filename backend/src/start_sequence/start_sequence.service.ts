@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SpeakerGateway } from 'src/speaker/speaker.gateway';
 import { TrackService } from 'src/track/track.service';
 import { CountdownGateway } from 'src/countdown/countdown.gateway';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class StartSequenceService {
@@ -9,13 +10,16 @@ export class StartSequenceService {
     private speakerGateway: SpeakerGateway,
     private trackService: TrackService,
     private countdownGateway: CountdownGateway,
+    private configService: ConfigService,
   ) {}
 
   private tracksStartTime: number | null = null;
-  private startDelay: number = 10000; // 10 seconds
+  private startDelay: number;
   private startTimeoutId: NodeJS.Timeout | null = null;
 
   startSequence() {
+    this.startDelay = this.configService.getConfig().options.countdown * 1000;
+
     if (this.tracksStartTime === null) {
       this.tracksStartTime = Date.now() + this.startDelay;
       this.speakerGateway.updateSpeakersStartTime(this.tracksStartTime);

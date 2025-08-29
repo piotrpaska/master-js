@@ -9,7 +9,7 @@ tracks:
     color: '#FF0000'
   - id: '2'
     name: Track 2
-    color: '#00FF00'
+    color: '#0004FFFF'
 sensors:
   - id: '1'
     name: Sensor 1
@@ -29,3 +29,4 @@ sensors:
     trackId: '2'
 options:
   blockEntryAfterRun: false
+  countdown: 10
