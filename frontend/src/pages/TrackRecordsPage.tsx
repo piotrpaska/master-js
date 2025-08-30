@@ -41,8 +41,8 @@ export default function TrackRecordsPage(): React.JSX.Element {
 
       for (const trackId in tracks) {
         tracks[trackId].sort((a, b) => {
-          const timeA = Number(a.duration ?? 0);
-          const timeB = Number(b.duration ?? 0);
+          const timeA = a.duration === null ? Infinity : Number(a.duration);
+          const timeB = b.duration === null ? Infinity : Number(b.duration);
           return timeA - timeB;
         });
       }
@@ -59,25 +59,36 @@ export default function TrackRecordsPage(): React.JSX.Element {
       <div className="flex gap-4 mt-4 w-full overflow-scroll">
         {Object.entries(trackWithRecords ?? {}).map(([trackId, records]) => (
           <div className="w-full" key={trackId}>
-            <h2 className="text-lg font-bold">
+            <h2 className="text-sm md:text-base xl:text-3xl font-bold mb-1">
               {data?.tracks.find((t) => t.id === trackId)?.name ||
                 'Unknown Track'}
             </h2>
-            <Table>
+            <Table className="text-xl">
               <TableHeader>
                 <TableRow>
                   <TableHead>Rank</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Time</TableHead>
+                  <TableHead className="text-center">Time</TableHead>
+                  <TableHead className="text-center"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {records.map((record, index) => (
-                  <TableRow key={record.id}>
+                  <TableRow
+                    key={record.id}
+                    className={
+                      record.duration === null ? 'text-muted-foreground' : ''
+                    }
+                  >
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{record.entry.athlete.name}</TableCell>
-                    <TableCell>
-                      {formatTime(Number(record.duration ?? 0), false)}
+                    <TableCell className="text-center">
+                      {record.duration !== null
+                        ? formatTime(Number(record.duration), false)
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {record.status}
                     </TableCell>
                   </TableRow>
                 ))}

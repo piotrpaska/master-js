@@ -62,8 +62,10 @@ const columns: ColumnDef<
 
 export default function RecordsTable({
   limit,
+  compact,
 }: {
   limit?: number;
+  compact?: boolean;
 }): React.JSX.Element {
   const { data } = useMasterSocket();
 
@@ -79,20 +81,21 @@ export default function RecordsTable({
   }, [data?.activeStartList?.session?.records]);
 
   const bestPerEntryRecordsFromBest = React.useMemo(() => {
-    const records = allRecordsFromBest;
+    const records = data?.activeStartList?.session?.records ?? [];
     const bestRecords: Record<
       string,
       TimeRecord & { entry: Entry & { athlete: Athlete } }
     > = {};
     records.forEach((record) => {
-      const key = record.entry.athlete.id;
+      const entryId = record.entry.id;
+
       if (
-        !bestRecords[key] ||
+        !bestRecords[entryId] ||
         (record.duration !== null &&
-          (bestRecords[key].duration === null ||
-            record.duration < bestRecords[key].duration))
+          (bestRecords[entryId].duration === null ||
+            Number(record.duration) < Number(bestRecords[entryId].duration)))
       ) {
-        bestRecords[key] = record;
+        bestRecords[entryId] = record;
       }
     });
     // Sort by duration ascending (lowest duration on top, nulls last)
@@ -101,7 +104,7 @@ export default function RecordsTable({
       if (b.duration === null) return -1;
       return Number(a.duration - b.duration);
     });
-  }, [allRecordsFromBest]);
+  }, [data?.activeStartList?.session?.records]);
 
   const table = useReactTable({
     data:
@@ -123,24 +126,20 @@ export default function RecordsTable({
             setDisplayMode(displayMode);
           }
         }}
-        className="mb-4 flex w-full justify-center rounded-md border bg-secondary p-1"
+        className="mb-4"
       >
-        <ToggleGroupItem
-          value="best"
-          className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-        >
-          Best Records
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="all"
-          className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-        >
-          All Records
-        </ToggleGroupItem>
+        <ToggleGroupItem value="best">Best Records</ToggleGroupItem>
+        <ToggleGroupItem value="all">All Records</ToggleGroupItem>
       </ToggleGroup>
 
       <div className="rounded-md border">
-        <Table>
+        <Table
+          className={
+            compact
+              ? ''
+              : 'text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl'
+          }
+        >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -159,16 +158,18 @@ export default function RecordsTable({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   className={
-                    data?.tracks?.some(
+                    (data?.tracks?.some(
                       (track) => track.relatedLastRecordId === row.original.id
                     )
                       ? 'animate-yellow-fade'
-                      : ''
+                      : '') +
+                    ' ' +
+                    (index % 2 === 0 ? 'bg-muted' : '')
                   }
                   style={{
                     display: limit

@@ -113,7 +113,7 @@ export function Dashboard(): React.JSX.Element {
         </div>
         <div>
           <h2 className="text-lg font-semibold mb-2">Top 3 - Records</h2>
-          <RecordsTable limit={3} />
+          <RecordsTable limit={3} compact />
         </div>
       </div>
     </>
